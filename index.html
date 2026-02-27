@@ -6,219 +6,72 @@
     <title>SUMMA WHOLESALE TERMINAL</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        /* ALIEN THEME BASE */
-        html, body { 
-            background: radial-gradient(circle, #0a0f0a 0%, #000 100%) !important; 
-            color: #3f3 !important; 
-            font-family: 'Courier New', monospace; 
-            margin: 0; padding: 0; overflow-x: hidden;
+        /* COLOR PALETTE FROM LOGO */
+        :root {
+            --summa-gold: #eeb43b; /* Gold from the logo image */
+            --summa-black: #050505;
+            --summa-grey: #1a1a1a;
+            --summa-text: #d1d1d1;
         }
 
-        /* SCANLINE EFFECT */
-        body::after {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 2px);
-            pointer-events: none; z-index: 1000;
+        html, body { 
+            background: var(--summa-black); 
+            color: var(--summa-text); 
+            font-family: 'Courier New', monospace; 
+            margin: 0; padding: 0; overflow-x: hidden;
         }
 
         /* LOADING SCREEN */
         #loader { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             display: flex; flex-direction: column; justify-content: center; 
-            align-items: center; background: #000; z-index: 10000; 
+            align-items: center; background: var(--summa-black); z-index: 10000; 
         }
-        .alien-circle {
-            width: 100px; height: 100px; border: 3px solid #0f0; border-radius: 50%;
-            border-top-color: #f0f; animation: spin 1s linear infinite;
-            box-shadow: 0 0 15px #0f0;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* THE MAIN CHASSIS */
+        .loader-container { position: relative; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; }
+
+        .alien-circle {
+            position: absolute; width: 100%; height: 100%; 
+            border: 2px solid rgba(238, 180, 59, 0.2); border-radius: 50%;
+            border-top-color: var(--summa-gold); animation: spin 1.2s linear infinite;
+        }
+
+        .leaf-icon { width: 60px; height: 60px; fill: var(--summa-gold); filter: drop-shadow(0 0 8px rgba(238, 180, 59, 0.5)); animation: pulse 2s ease-in-out infinite; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { transform: scale(0.95); opacity: 0.7; } 50% { transform: scale(1.05); opacity: 1; } }
+
+        /* THE INTERFACE */
         #app { 
             display: none; width: 95vw; max-width: 450px; margin: 20px auto; 
-            background: #1a1a1a; border: 4px solid #333; 
-            border-radius: 20px; box-shadow: 0 0 30px rgba(0,255,0,0.2);
-            overflow: hidden; position: relative;
+            background: var(--summa-grey); border: 2px solid #333; 
+            border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            overflow: hidden;
         }
 
         .title-bar { 
-            background: #000; color: #0f0; padding: 12px; 
-            text-align: center; font-size: 11px; font-weight: bold;
-            border-bottom: 2px solid #333; letter-spacing: 2px;
+            background: var(--summa-black); color: var(--summa-gold); padding: 15px; 
+            text-align: center; font-size: 13px; font-weight: bold;
+            border-bottom: 1px solid var(--summa-gold); letter-spacing: 3px;
         }
 
         #menu-list { 
-            background: #050505; margin: 10px; 
-            border: 2px solid #0f0; border-radius: 15px;
+            background: #0d0d0d; margin: 10px; 
+            border: 1px solid #222; border-radius: 8px;
             overflow-y: auto; height: 60vh;
-            box-shadow: inset 0 0 15px #0f0;
         }
         
         .category-btn { 
-            width: 100%; padding: 18px; 
-            background: linear-gradient(180deg, #222, #000);
-            color: #0f0; text-align: left; border: none;
-            border-bottom: 1px solid #0f0; font-weight: bold; 
+            width: 100%; padding: 20px; 
+            background: var(--summa-grey);
+            color: var(--summa-gold); text-align: left; border: none;
+            border-bottom: 1px solid #222; font-weight: bold; 
             cursor: pointer; display: flex; justify-content: space-between;
         }
 
-        .category-content { display: none; background: rgba(0,255,0,0.03); }
+        .category-content { display: none; background: rgba(238, 180, 59, 0.02); }
         
         .section-header { 
-            background: rgba(255,0,255,0.1); color: #f0f; 
-            padding: 8px 12px; font-size: 10px; border-bottom: 1px solid #f0f;
-        }
-
-        .item-row { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #111; }
-        
-        .item-row input[type="checkbox"] { 
-            appearance: none; width: 20px; height: 20px; 
-            border: 2px solid #0f0; border-radius: 4px; margin-right: 12px; 
-        }
-        .item-row input:checked { background: #0f0; }
-
-        .footer { padding: 15px; background: #1a1a1a; }
-        .order-btn { 
-            width: 100%; padding: 20px; 
-            background: #000; color: #0f0; 
-            border: 2px solid #0f0; border-radius: 50px; 
-            font-weight: bold; cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-
-    <div id="loader">
-        <div class="alien-circle"></div>
-        <div style="margin-top:20px; color: #0f0; font-size: 12px;">DECRYPTING DATABASE...</div>
-    </div>
-
-    <div id="app">
-        <div class="title-bar">SUMMA TERMINAL v2.0</div>
-        <div id="menu-list"></div>
-        <div class="footer">
-            <button class="order-btn" onclick="playBeep(600, 0.1); sendEmail()">REQUEST INFO</button>
-        </div>
-    </div>
-
-    <script>
-        // --- SYNTH SOUND ENGINE ---
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        function playBeep(freq, duration) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'square'; // "Retro" sound
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + duration);
-        }
-
-        // --- CORE LOGIC ---
-        function toggleCategory(id) {
-            playBeep(400, 0.15); // "Thud" sound for doors
-            const content = document.getElementById(id);
-            const isOpen = content.style.display === "block";
-            document.querySelectorAll('.category-content').forEach(c => c.style.display = "none");
-            if (!isOpen) content.style.display = "block";
-        }
-
-        window.onload = () => {
-            loadMenu();
-            setTimeout(() => {
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('app').style.display = 'block';
-            }, 2000);
-        };
-
-        async function loadMenu() {
-            try {
-                const resp = await fetch('menu.xlsx');
-                const buf = await resp.arrayBuffer();
-                const wb = XLSX.read(new Uint8Array(buf), {type: 'array'});
-                const list = document.getElementById('menu-list');
-
-                wb.SheetNames.forEach((name, idx) => {
-                    const rows = XLSX.utils.sheet_to_json(wb.Sheets[name], {header: 1});
-                    
-                    const b = document.createElement('button');
-                    b.className = "category-btn";
-                    b.innerHTML = `<span>${name.toUpperCase()}</span> <span>+</span>`;
-                    b.onclick = () => toggleCategory('cat-' + idx);
-                    list.appendChild(b);
-
-                    const cont = document.createElement('div');
-                    cont.id = 'cat-' + idx;
-                    cont.className = "category-content";
-
-                    let sCol = -1, tCol = -1, pCol = -1;
-                    let currentItems = [];
-                    let currentSection = "General";
-
-                    const flush = (title) => {
-                        if (currentItems.length > 0) {
-                            const h = document.createElement('div');
-                            h.className = "section-header";
-                            h.innerText = title;
-                            cont.appendChild(h);
-
-                            // Sort Highest THC first
-                            currentItems.sort((a, b) => {
-                                let vA = parseFloat(a.thc.toString().replace(/[^0-9.]/g, '')) || 0;
-                                let vB = parseFloat(b.thc.toString().replace(/[^0-9.]/g, '')) || 0;
-                                return vB - vA;
-                            });
-
-                            currentItems.forEach(item => {
-                                const r = document.createElement('div');
-                                r.className = 'item-row';
-                                r.onclick = () => playBeep(800, 0.05); // "Click" sound
-                                r.innerHTML = `
-                                    <input type="checkbox" class="order-check" value="${item.name}">
-                                    <div>
-                                        <div style="font-weight:bold; color:#fff;">${item.name}</div>
-                                        <div style="color:#0f0; font-size:11px;">THC: ${item.thc}% | $${item.price}</div>
-                                    </div>
-                                `;
-                                cont.appendChild(r);
-                            });
-                            currentItems = [];
-                        }
-                    };
-
-                    rows.forEach(r => {
-                        if (r.includes("Strain")) {
-                            sCol = r.indexOf("Strain");
-                            tCol = r.findIndex(c => c && c.toString().includes("THC"));
-                            pCol = r.findIndex(c => c && c.toString().includes("Price"));
-                            return;
-                        }
-                        if (r[0] && !r[tCol]) {
-                            flush(currentSection);
-                            currentSection = r[0];
-                        } else if (sCol > -1 && r[sCol]) {
-                            currentItems.push({name: r[sCol], thc: r[tCol] || '0', price: r[pCol] || 'TBD'});
-                        }
-                    });
-                    flush(currentSection);
-                    list.appendChild(cont);
-                });
-            } catch (e) { console.error(e); }
-        }
-
-        function sendEmail() {
-            const checks = document.querySelectorAll('.order-check:checked');
-            if (checks.length === 0) return;
-            let items = "";
-            checks.forEach(c => items += "- " + c.value + "%0A");
-            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Order&body=${items}`;
-        }
-    </script>
-</body>
-</html>
+            background: #111; color: var(--summa-gold); 
+            padding: 10px 15px; font-size: 11px; border-bottom: 1px solid #222;
+            text-transform: uppercase; opacity: 0.
