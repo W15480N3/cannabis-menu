@@ -6,56 +6,53 @@
     <title>SUMMA WHOLESALE</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        :root { --summa-gold: #eeb43b; --summa-black: #050505; --summa-grey: #1a1a1a; }
+        :root { --gold: #eeb43b; --bg: #050505; --card: #1a1a1a; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { background: var(--summa-black); color: #d1d1d1; font-family: 'Courier New', monospace; margin: 0; padding: 0; overflow: hidden; height: 100dvh; }
+        body { background: var(--bg); color: #d1d1d1; font-family: 'Courier New', monospace; margin: 0; padding: 0; height: 100dvh; overflow: hidden; }
         
-        #loader { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--summa-black); z-index: 10000; color: var(--summa-gold); }
-        #app { display: none; width: 100%; height: 100dvh; max-width: 450px; margin: 0 auto; background: var(--summa-grey); flex-direction: column; position: relative; }
+        #loader { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--bg); z-index: 10000; color: var(--gold); }
+        .spinner { width: 40px; height: 40px; border: 3px solid #333; border-top: 3px solid var(--gold); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .logo-bar { background: var(--summa-black); padding: 20px 10px; text-align: center; border-bottom: 1px solid var(--summa-gold); flex-shrink: 0; }
-        .logo-img { max-width: 200px; width: 60%; height: auto; }
+        #app { display: none; width: 100%; height: 100dvh; max-width: 450px; margin: 0 auto; background: var(--card); flex-direction: column; }
+        .logo-bar { background: var(--bg); padding: 20px; text-align: center; border-bottom: 1px solid var(--gold); flex-shrink: 0; }
+        .logo-img { max-width: 180px; width: 60%; }
         
-        #menu-list { background: #000; flex-grow: 1; overflow-y: auto; border: 1px solid #222; -webkit-overflow-scrolling: touch; }
+        #menu-list { background: #000; flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         
-        /* DROPDOWNS */
-        .category-header { 
-            background: #1a1a1a; color: var(--summa-gold); 
-            padding: 20px 15px; font-weight: 900; font-size: 16px; 
-            border-bottom: 1px solid #333; cursor: pointer; 
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .category-content { display: none; background: #000; }
+        .cat-header { background: #1a1a1a; color: var(--gold); padding: 20px; font-weight: 900; border-bottom: 1px solid #333; cursor: pointer; display: flex; justify-content: space-between; }
+        .cat-box { display: none; background: #000; }
 
-        .item-row { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #111; width: 100%; }
-        .item-info { flex-grow: 1; margin-left: 15px; cursor: pointer; }
-        
-        .order-check { width: 28px; height: 28px; border: 2px solid var(--summa-gold); border-radius: 4px; background: transparent; appearance: none; flex-shrink: 0; cursor: pointer; }
-        .order-check:checked { background: var(--summa-gold); }
+        .row { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #111; }
+        .info { flex-grow: 1; margin-left: 15px; cursor: pointer; }
+        .check { width: 28px; height: 28px; border: 2px solid var(--gold); appearance: none; cursor: pointer; flex-shrink: 0; }
+        .check:checked { background: var(--gold); }
 
-        /* MODAL */
-        #detail-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 11000; justify-content: center; align-items: center; padding: 20px; }
-        .detail-box { background: #1a1a1a; border: 1px solid var(--summa-gold); width: 100%; max-width: 340px; padding: 25px; border-radius: 4px; }
-        .detail-label { color: var(--summa-gold); font-size: 10px; margin-top: 12px; font-weight: bold; }
-        .detail-val { color: #fff; font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 4px; margin-bottom: 4px; word-break: break-all; }
+        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 11000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-box { background: #1a1a1a; border: 1px solid var(--gold); width: 100%; max-width: 340px; padding: 20px; }
+        .label { color: var(--gold); font-size: 10px; margin-top: 10px; font-weight: bold; }
+        .val { color: #fff; font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 4px; margin-bottom: 4px; }
 
-        .footer { padding: 15px; background: var(--summa-black); border-top: 1px solid var(--summa-gold); flex-shrink: 0; }
-        .order-btn { width: 100%; padding: 18px; background: var(--summa-gold); color: #000; border: none; border-radius: 4px; font-weight: 900; font-family: inherit; }
+        .footer { padding: 15px; background: var(--bg); border-top: 1px solid var(--gold); }
+        .btn { width: 100%; padding: 18px; background: var(--gold); color: #000; border: none; font-weight: 900; font-family: inherit; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="loader">INITIALIZING TERMINAL...</div>
+    <div id="loader">
+        <div class="spinner"></div>
+        <div>CONNECTING TO SECURE DATA...</div>
+    </div>
 
-    <div id="detail-overlay" onclick="this.style.display='none'">
-        <div class="detail-box" onclick="event.stopPropagation()">
-            <div id="det-strain" style="color:var(--summa-gold); font-weight:bold; font-size:20px; border-bottom: 1px solid var(--summa-gold); padding-bottom:10px; margin-bottom:10px;">--</div>
-            <div class="detail-label">METRC ID</div><div id="det-metrc" class="detail-val">--</div>
-            <div class="detail-label">LOT NUMBER</div><div id="det-lot" class="detail-val">--</div>
-            <div class="detail-label">HARVEST DATE</div><div id="det-harvest" class="detail-val">--</div>
-            <div class="detail-label">STOCK QUANTITY</div><div id="det-qty" class="detail-val">--</div>
-            <div class="detail-label">THC %</div><div id="det-thc" class="detail-val">--</div>
-            <button onclick="document.getElementById('detail-overlay').style.display='none'" style="width:100%; margin-top:20px; padding:12px; background:#333; color:white; border:none; font-family:inherit;">BACK</button>
+    <div id="modal" onclick="this.style.display='none'">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div id="m-strain" style="color:var(--gold); font-weight:bold; font-size:20px; border-bottom: 1px solid var(--gold); padding-bottom:10px; margin-bottom:10px;">--</div>
+            <div class="label">METRC ID</div><div id="m-metrc" class="val">--</div>
+            <div class="label">LOT NUMBER</div><div id="m-lot" class="val">--</div>
+            <div class="label">HARVEST DATE</div><div id="m-harvest" class="val">--</div>
+            <div class="label">STOCK QUANTITY</div><div id="m-qty" class="val">--</div>
+            <div class="label">THC %</div><div id="m-thc" class="val">--</div>
+            <button onclick="document.getElementById('modal').style.display='none'" style="width:100%; margin-top:20px; padding:10px; background:#333; color:#fff; border:none; font-family:inherit;">BACK</button>
         </div>
     </div>
 
@@ -63,97 +60,105 @@
         <div class="logo-bar"><img src="summa.webp" alt="SUMMA" class="logo-img"></div>
         <div id="menu-list"></div>
         <div class="footer">
-            <button class="order-btn" onclick="sendEmail()">REQUEST SELECTED <span id="count-badge"></span></button>
+            <button class="btn" onclick="send()">REQUEST SELECTED <span id="count"></span></button>
         </div>
     </div>
 
     <script>
+        // Use a safe toggle function
         function toggle(id) {
             const el = document.getElementById(id);
-            const isVisible = el.style.display === 'block';
-            document.querySelectorAll('.category-content').forEach(c => c.style.display = 'none');
-            el.style.display = isVisible ? 'none' : 'block';
+            if (!el) return;
+            const open = el.style.display === 'block';
+            document.querySelectorAll('.cat-box').forEach(c => c.style.display = 'none');
+            el.style.display = open ? 'none' : 'block';
         }
 
-        function showPop(strain, metrc, lot, harvest, qty, thc) {
-            document.getElementById('det-strain').innerText = strain;
-            document.getElementById('det-metrc').innerText = metrc || 'N/A';
-            document.getElementById('det-lot').innerText = lot || 'N/A';
-            document.getElementById('det-harvest').innerText = harvest || 'N/A';
-            document.getElementById('det-qty').innerText = qty || 'N/A';
-            document.getElementById('det-thc').innerText = thc || 'N/A';
-            document.getElementById('detail-overlay').style.display = 'flex';
+        function pop(s, m, l, h, q, t) {
+            document.getElementById('m-strain').innerText = s || 'N/A';
+            document.getElementById('m-metrc').innerText = m || 'N/A';
+            document.getElementById('m-lot').innerText = l || 'N/A';
+            document.getElementById('m-harvest').innerText = h || 'N/A';
+            document.getElementById('m-qty').innerText = q || 'N/A';
+            document.getElementById('m-thc').innerText = t || 'N/A';
+            document.getElementById('modal').style.display = 'flex';
         }
 
-        async function init() {
+        async function start() {
             try {
-                const r = await fetch('menu.xlsx');
-                if(!r.ok) throw "File Not Found";
-                const b = await r.arrayBuffer();
-                const wb = XLSX.read(new Uint8Array(b), {type:'array'});
+                const response = await fetch('menu.xlsx');
+                if(!response.ok) throw "File 'menu.xlsx' not found.";
+                
+                const arrayBuffer = await response.arrayBuffer();
+                const workbook = XLSX.read(new Uint8Array(arrayBuffer), {type:'array'});
                 const list = document.getElementById('menu-list');
 
-                wb.SheetNames.forEach((sName, i) => {
-                    const data = XLSX.utils.sheet_to_json(wb.Sheets[sName], {header:1});
-                    if(data.length < 1) return;
+                workbook.SheetNames.forEach((sName, i) => {
+                    const data = XLSX.utils.sheet_to_json(workbook.Sheets[sName], {header:1});
+                    if (data.length === 0) return;
 
-                    const head = data[0].map(h => String(h || "").toLowerCase().replace(/[#*_\s]/g, ''));
-                    const find = (keys) => head.findIndex(h => keys.some(k => h.includes(k)));
+                    // Header scrubbing logic
+                    const headers = (data[0] || []).map(h => String(h || "").toLowerCase().replace(/[#*_\s]/g, ''));
+                    const getCol = (keys) => headers.findIndex(h => keys.some(k => h.includes(k)));
 
-                    const col = {
-                        s: find(['strain']),
-                        t: find(['thc']),
-                        h: find(['harvest']),
-                        q: find(['quant', 'qty']),
-                        l: find(['lot']),
-                        m: find(['metrc'])
+                    const idx = {
+                        s: getCol(['strain']),
+                        t: getCol(['thc']),
+                        h: getCol(['harvest']),
+                        q: getCol(['quant', 'qty']),
+                        l: getCol(['lot']),
+                        m: getCol(['metrc'])
                     };
 
-                    const catId = 'c-' + i;
+                    const cId = 'cat-' + i;
                     const hDiv = document.createElement('div');
-                    hDiv.className = 'category-header';
+                    hDiv.className = 'cat-header';
                     hDiv.innerHTML = `<span>${sName.toUpperCase()}</span><span>▼</span>`;
-                    hDiv.onclick = () => toggle(catId);
+                    hDiv.onclick = () => toggle(cId);
                     list.appendChild(hDiv);
 
                     const cDiv = document.createElement('div');
-                    cDiv.id = catId; cDiv.className = 'category-content';
+                    cDiv.id = cId;
+                    cDiv.className = 'cat-box';
 
                     data.slice(1).forEach(row => {
-                        if(!row[col.s]) return;
+                        if(!row || !row[idx.s]) return; // Skip empty rows
                         const item = document.createElement('div');
-                        item.className = 'item-row';
+                        item.className = 'row';
                         item.innerHTML = `
-                            <input type="checkbox" class="order-check" data-name="${row[col.s]}">
-                            <div class="item-info">
-                                <div style="font-weight:bold; color:white;">${row[col.s]}</div>
-                                <div style="font-size:11px; color:var(--summa-gold);">THC: ${row[col.t]||'--'}% | INFO ></div>
+                            <input type="checkbox" class="check" data-name="${row[idx.s]}">
+                            <div class="info">
+                                <div style="font-weight:bold; color:white;">${row[idx.s]}</div>
+                                <div style="font-size:11px; color:var(--gold);">THC: ${row[idx.t]||'--'}% | DETAILS ></div>
                             </div>
                         `;
-                        // Fix for mobile taps
-                        item.querySelector('.item-info').onclick = () => showPop(row[col.s], row[col.m], row[col.l], row[col.h], row[col.q], row[col.t]);
-                        item.querySelector('.order-check').onchange = () => {
-                            const count = document.querySelectorAll('.order-check:checked').length;
-                            document.getElementById('count-badge').innerText = count > 0 ? `(${count})` : "";
+                        item.querySelector('.info').onclick = () => pop(row[idx.s], row[idx.m], row[idx.l], row[idx.h], row[idx.q], row[idx.t]);
+                        item.querySelector('.check').onchange = () => {
+                            const n = document.querySelectorAll('.check:checked').length;
+                            document.getElementById('count').innerText = n > 0 ? `(${n})` : "";
                         };
                         cDiv.appendChild(item);
                     });
                     list.appendChild(cDiv);
                 });
+
                 document.getElementById('loader').style.display = 'none';
                 document.getElementById('app').style.display = 'flex';
+
             } catch(e) {
-                document.getElementById('loader').innerHTML = "TERMINAL ERROR: <br>"+e+"<br>CHECK FILENAME 'menu.xlsx'";
+                const l = document.getElementById('loader');
+                l.innerHTML = `<div style="padding:20px; text-align:center;">CRITICAL ERROR:<br>${e}<br><br>Confirm menu.xlsx is in the root folder.</div>`;
             }
         }
 
-        function sendEmail() {
-            const selected = Array.from(document.querySelectorAll('.order-check:checked')).map(cb => cb.dataset.name);
-            if(selected.length === 0) return;
-            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Request&body=Inquiry for:%0A%0A- ${selected.join('%0A- ')}`;
+        function send() {
+            const sel = Array.from(document.querySelectorAll('.check:checked')).map(c => c.dataset.name);
+            if(sel.length === 0) return;
+            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Request&body=Requesting Information For:%0A%0A- ${sel.join('%0A- ')}`;
         }
 
-        init();
+        // Run after window loads to ensure library is ready
+        window.addEventListener('load', start);
     </script>
 </body>
 </html>
