@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SUMMA ALIEN TERMINAL</title>
+    <title>SUMMA WHOLESALE TERMINAL</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         /* ALIEN THEME BASE */
@@ -21,7 +21,7 @@
             pointer-events: none; z-index: 1000;
         }
 
-        /* LOADING SCREEN (ALIEN POD) */
+        /* LOADING SCREEN */
         #loader { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             display: flex; flex-direction: column; justify-content: center; 
@@ -34,7 +34,7 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* THE MAIN CHASSIS (WINAMP STYLE) */
+        /* THE MAIN CHASSIS */
         #app { 
             display: none; width: 95vw; max-width: 450px; margin: 20px auto; 
             background: #1a1a1a; border: 4px solid #333; 
@@ -42,10 +42,9 @@
             overflow: hidden; position: relative;
         }
 
-        /* TOP CONSOLE */
         .title-bar { 
-            background: #000; color: #0f0; padding: 10px; 
-            text-align: center; font-size: 10px; font-weight: bold;
+            background: #000; color: #0f0; padding: 12px; 
+            text-align: center; font-size: 11px; font-weight: bold;
             border-bottom: 2px solid #333; letter-spacing: 2px;
             text-shadow: 0 0 5px #0f0;
         }
@@ -60,7 +59,7 @@
             box-shadow: inset 0 0 15px #0f0;
         }
         
-        /* CATEGORY BUTTONS (SKEUOMORPHIC) */
+        /* CATEGORY BUTTONS */
         .category-btn { 
             width: 100%; padding: 18px; 
             background: linear-gradient(180deg, #333, #111);
@@ -68,37 +67,39 @@
             border-bottom: 1px solid #0f0; font-weight: bold; 
             cursor: pointer; font-size: 16px; display: flex; 
             justify-content: space-between; align-items: center;
-            transition: 0.3s;
         }
         .category-btn:hover { background: #222; text-shadow: 0 0 10px #0f0; }
 
         .category-content { display: none; background: rgba(0,255,0,0.05); }
         
-        /* ITEM ROWS */
         .section-header { 
             background: rgba(255,0,255,0.1); color: #f0f; 
-            padding: 8px; font-size: 11px; font-weight: bold; 
+            padding: 10px; font-size: 11px; font-weight: bold; 
             border-bottom: 1px solid #f0f; text-shadow: 0 0 5px #f0f;
+            letter-spacing: 1px;
         }
+
         .item-row { 
             display: flex; align-items: center; padding: 15px 10px; 
             border-bottom: 1px solid #1a1a1a; 
         }
+
         .item-row input[type="checkbox"] { 
-            appearance: none; width: 20px; height: 20px; 
-            border: 2px solid #0f0; border-radius: 50%; margin-right: 15px; 
+            appearance: none; width: 22px; height: 22px; 
+            border: 2px solid #0f0; border-radius: 4px; margin-right: 15px; 
             cursor: pointer; position: relative;
         }
         .item-row input:checked { background: #0f0; box-shadow: 0 0 10px #0f0; }
+        .item-row input:checked::after { content: "✓"; color: black; font-weight: bold; position: absolute; left: 4px; top: -2px; }
 
         /* FOOTER & BUTTONS */
-        .footer { padding: 15px; background: #1a1a1a; display: flex; flex-direction: column; gap: 10px; }
+        .footer { padding: 15px; background: #1a1a1a; }
         .order-btn { 
-            width: 100%; padding: 20px; 
+            width: 100%; padding: 22px; 
             background: #000; color: #0f0; 
             border: 2px solid #0f0; border-radius: 50px; 
             font-weight: bold; cursor: pointer; text-transform: uppercase;
-            box-shadow: 0 0 10px rgba(0,255,0,0.3);
+            box-shadow: 0 0 10px rgba(0,255,0,0.3); letter-spacing: 1px;
         }
         .order-btn:hover { box-shadow: 0 0 20px #0f0; background: #0f0; color: #000; }
     </style>
@@ -107,41 +108,34 @@
 
     <div id="loader">
         <div class="alien-circle"></div>
-        <div style="margin-top:20px; letter-spacing: 5px; color: #0f0;">UPLOADING BIOMETRICS...</div>
+        <div style="margin-top:20px; letter-spacing: 5px; color: #0f0;">LOADING SUMMA INVENTORY...</div>
     </div>
 
     <div id="app">
         <div id="admin-zone">
             <input type="file" id="excel-upload" accept=".xlsx" style="display:none;">
-            <button onclick="document.getElementById('excel-upload').click()" style="background:none; color:red; border:1px solid red; cursor:pointer;">[ ACCESS MASTER DATABASE ]</button>
+            <button onclick="document.getElementById('excel-upload').click()" style="background:none; color:#f0f; border:1px solid #f0f; cursor:pointer; padding:5px;">[ ADMIN: UPDATE DATABASE ]</button>
         </div>
 
-        <div class="title-bar">SUMMA MENU PORTAL // MODEL v4.2</div>
+        <div class="title-bar">SUMMA CANNABIS // WHOLESALE INTERFACE</div>
 
         <div id="menu-list">
-            <p style="color:#0f0; padding:20px; text-align:center; animation: pulse 1.5s infinite;">CONNECTING TO HIVE...</p>
+            <p style="color:#0f0; padding:20px; text-align:center;">Synchronizing...</p>
         </div>
 
         <div class="footer">
-            <button class="order-btn" onclick="sendEmail()">Transmit Selection</button>
+            <button class="order-btn" onclick="sendEmail()">Request Product Info</button>
         </div>
     </div>
 
     <script>
-        // TOGGLE WITH ANIMATION EFFECT
         function toggleCategory(id) {
             const content = document.getElementById(id);
             const isOpen = content.style.display === "block";
-            
-            // Close all
             document.querySelectorAll('.category-content').forEach(c => c.style.display = "none");
-            
-            if (!isOpen) {
-                content.style.display = "block";
-            }
+            if (!isOpen) { content.style.display = "block"; }
         }
 
-        // EMERGENCY OVERRIDE
         setTimeout(() => {
             document.getElementById('loader').style.display = 'none';
             document.getElementById('app').style.display = 'block';
@@ -153,7 +147,6 @@
                 document.getElementById('admin-zone').style.setProperty("display", "block", "important");
             }
             loadMenu();
-
             document.getElementById('excel-upload').addEventListener('change', function(e) {
                 const reader = new FileReader();
                 reader.onload = (event) => processData(event.target.result);
@@ -168,7 +161,7 @@
                 const buf = await resp.arrayBuffer();
                 processData(buf);
             } catch (e) {
-                document.getElementById('menu-list').innerHTML = "<p style='color:#0f0; padding:30px; text-align:center;'>TERMINAL READY.<br><br>Awaiting manual data injection.</p>";
+                document.getElementById('menu-list').innerHTML = "<p style='color:#0f0; padding:30px; text-align:center;'>AWAITING DATABASE INJECTION.</p>";
             }
         }
 
@@ -180,10 +173,9 @@
 
                 wb.SheetNames.forEach((name, idx) => {
                     const rows = XLSX.utils.sheet_to_json(wb.Sheets[name], {header: 1});
-                    
                     const b = document.createElement('button');
                     b.className = "category-btn";
-                    b.innerHTML = `<span>[ ${name.toUpperCase()} ]</span> <span>◈</span>`;
+                    b.innerHTML = `<span>📂 ${name.toUpperCase()}</span> <span>◈</span>`;
                     b.onclick = function() { toggleCategory('cat-' + idx); };
                     list.appendChild(b);
 
@@ -204,7 +196,7 @@
                         if (r[0] && !r[tCol] && !r[pCol] && r[0] !== "Strain") {
                             const h = document.createElement('div');
                             h.className = "section-header";
-                            h.innerText = ">> SOURCE: " + r[0];
+                            h.innerText = "CATEGORY: " + r[0];
                             cont.appendChild(h);
                         }
 
@@ -214,8 +206,8 @@
                             rowDiv.innerHTML = `
                                 <input type="checkbox" class="order-check" value="${r[sCol]} (${name})">
                                 <div>
-                                    <div style="font-weight:bold; color:#fff;">${r[sCol]}</div>
-                                    <div style="color:#0f0; font-size:11px;">PURITY: ${r[tCol] || '?'}% | CREDITS: ${r[pCol] || 'TBD'}</div>
+                                    <div style="font-weight:bold; color:#fff; font-size:15px;">${r[sCol]}</div>
+                                    <div style="color:#0f0; font-size:11px;">THC: ${r[tCol] || '?'}% | Wholesale: $${r[pCol] || 'TBD'}</div>
                                 </div>
                             `;
                             cont.appendChild(rowDiv);
@@ -228,10 +220,20 @@
 
         function sendEmail() {
             const checks = document.querySelectorAll('.order-check:checked');
-            if (checks.length === 0) { alert("Selection empty. Assign biological material."); return; }
+            if (checks.length === 0) { alert("Please select items to proceed."); return; }
+            
             let items = "";
             checks.forEach(c => { items += "- " + c.value + "%0A"; });
-            window.location.href = `mailto:sales@summacannabis.com?subject=Transmission_Order&body=Requesting_Material:%0A%0A${items}`;
+            
+            const emailTo = "tiea@euphoriawellnessnv.com";
+            const subject = "Summa Wholesale Inquiry - Product Interest";
+            const body = "To the Summa Sales Team,%0D%0A%0D%0A" + 
+                         "I am interested in the following items from your current wholesale menu. " + 
+                         "Please reach out to me with more information regarding availability and next steps:%0D%0A%0D%0A" + 
+                         items + "%0D%0A%0D%0A" + 
+                         "Thank you.";
+            
+            window.location.href = `mailto:${emailTo}?subject=${subject}&body=${body}`;
         }
     </script>
 </body>
