@@ -11,7 +11,7 @@
             --summa-gold-glow: rgba(238, 180, 59, 0.2);
             --summa-black: #050505;
             --summa-grey: #1a1a1a;
-            --summa-red: #ff4444; /* Added for error state */
+            --summa-red: #ff4444;
         }
 
         html, body { 
@@ -62,7 +62,6 @@
         .logo-img { max-width: 250px; width: 80%; height: auto; animation: logoPulse 4s ease-in-out infinite; }
         @keyframes logoPulse { 0%, 100% { filter: drop-shadow(0 0 5px var(--summa-gold-glow)); transform: scale(1); } 50% { filter: drop-shadow(0 0 20px rgba(238, 180, 59, 0.4)); transform: scale(1.02); } }
 
-        /* CREATOR NOD (TOP) */
         .creator-tag {
             font-size: 8px; color: rgba(238, 180, 59, 0.4); 
             letter-spacing: 2px; text-transform: uppercase; padding: 10px 0;
@@ -76,15 +75,17 @@
             -webkit-overflow-scrolling: touch;
         }
         
-        .category-btn { width: 100%; padding: 18px; background: var(--summa-grey); color: var(--summa-gold); text-align: left; border: none; border-bottom: 1px solid #222; font-weight: bold; display: flex; justify-content: space-between; transition: background 0.2s; }
-        .category-btn:active { background: #222; }
+        .category-btn { width: 100%; padding: 18px; background: var(--summa-grey); color: var(--summa-gold); text-align: left; border: none; border-bottom: 1px solid #222; font-weight: bold; display: flex; justify-content: space-between; }
+        .category-content { display: none; background: rgba(238, 180, 59, 0.03); }
 
         .item-row { display: flex; align-items: center; padding: 14px; border-bottom: 1px solid #111; transition: background 0.3s; position: relative; overflow: hidden; }
         .item-row:active { background: rgba(238, 180, 59, 0.1); }
         .item-row input:checked + div { animation: textGlow 2s infinite; }
         @keyframes textGlow { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-        .item-row input[type="checkbox"] { appearance: none; width: 22px; height: 22px; border: 1px solid var(--summa-gold); border-radius: 4px; margin-right: 15px; position: relative; }
+        .item-row input[type="checkbox"] { appearance: none; width: 22px; height: 22px; border: 1px solid var(--summa-gold); border-radius: 4px; margin-right: 15px; position: relative; z-index: 2; }
         .item-row input:checked { background: var(--summa-gold); box-shadow: 0 0 10px var(--summa-gold); }
+
+        .section-header { background: #111; color: var(--summa-gold); padding: 10px 15px; font-size: 11px; border-bottom: 1px solid #222; }
 
         /* FOOTER */
         .footer { 
@@ -95,12 +96,18 @@
         .order-btn { 
             width: 100%; padding: 16px; background: var(--summa-gold); color: #000; 
             border: none; border-radius: 4px; font-weight: 900; text-transform: uppercase; 
-            transition: all 0.2s;
+            transition: all 0.2s; position: relative;
             animation: btnBreath 3s infinite ease-in-out;
         }
+        
+        #count-badge {
+            background: #000; color: var(--summa-gold); 
+            padding: 2px 8px; border-radius: 10px; font-size: 10px; margin-left: 8px;
+            border: 1px solid var(--summa-gold); vertical-align: middle;
+        }
+
         @keyframes btnBreath { 0%, 100% { box-shadow: 0 0 5px var(--summa-gold-glow); } 50% { box-shadow: 0 0 20px var(--summa-gold); } }
         
-        /* SHAKE ANIMATION */
         .error-shake {
             animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both !important;
             background: var(--summa-red) !important;
@@ -149,7 +156,9 @@
         </div>
         <div id="menu-list"></div>
         <div class="footer">
-            <button id="order-btn" class="order-btn" onclick="sendEmail()">CHECK AVAILABILITY</button>
+            <button id="order-btn" class="order-btn" onclick="sendEmail()">
+                CHECK AVAILABILITY <span id="count-badge" style="display:none">0</span>
+            </button>
             <button class="clear-btn" onclick="clearSelections()">Clear Selections</button>
         </div>
     </div>
@@ -167,6 +176,17 @@
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function updateCounter() {
+            const count = document.querySelectorAll('.order-check:checked').length;
+            const badge = document.getElementById('count-badge');
+            if (count > 0) {
+                badge.innerText = count;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
         }
 
         const phrases = ["INITIALIZING...", "DECRYPTING MENU...", "SYNCING STOCKS...", "LOADING SUMMA..."];
@@ -198,6 +218,7 @@
             if (confirmed) {
                 playBeep(150, 0.3);
                 document.querySelectorAll('.order-check').forEach(cb => cb.checked = false);
+                updateCounter();
             }
         }
 
@@ -232,6 +253,7 @@
                     const cont = document.createElement('div');
                     cont.id = 'cat-' + idx;
                     cont.className = "category-content";
+                    cont.style.display = "none";
 
                     let sCol = -1, tCol = -1, pCol = -1;
                     let currentItems = [];
@@ -254,11 +276,12 @@
                                 const r = document.createElement('div');
                                 r.className = 'item-row';
                                 r.onclick = (e) => {
+                                    const chk = r.querySelector('input');
                                     if(e.target.type !== 'checkbox') {
-                                        const chk = r.querySelector('input');
                                         chk.checked = !chk.checked;
                                     }
                                     playBeep(600, 0.05);
+                                    updateCounter();
                                 };
                                 r.innerHTML = `
                                     <input type="checkbox" class="order-check" 
@@ -302,7 +325,6 @@
             const checks = document.querySelectorAll('.order-check:checked');
             
             if (checks.length === 0) {
-                // ERROR STATE
                 playBeep(100, 0.1); 
                 playBeep(80, 0.2);
                 btn.classList.add('error-shake');
@@ -335,6 +357,7 @@
             
             setTimeout(() => {
                 document.querySelectorAll('.order-check').forEach(cb => cb.checked = false);
+                updateCounter();
             }, 1000);
         }
     </script>
