@@ -172,8 +172,16 @@
         }
 
         function clearSelections() {
-            playBeep(200, 0.2);
-            document.querySelectorAll('.order-check').forEach(cb => cb.checked = false);
+            // First play a neutral prompt tone
+            playBeep(300, 0.1);
+            
+            // Native browser confirmation
+            const confirmed = confirm("Are you sure you want to clear all selected items?");
+            
+            if (confirmed) {
+                playBeep(150, 0.3); // Lower "action" tone
+                document.querySelectorAll('.order-check').forEach(cb => cb.checked = false);
+            }
         }
 
         window.onload = () => {
