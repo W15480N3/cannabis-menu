@@ -1,46 +1,9 @@
+<div class="navigation-bar">
+    <button id="back-btn" onclick="showFolderList()" style="display:none;">[ < BACK ]</button>
+    <span id="current-folder">ROOT:\\SUMMA</span>
+</div>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SUMMA WHOLESALE</title>
-    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-    <div id="loader">
-        <div class="glitch">INITIALIZING CANNABIS...</div>
-        <div class="scanline"></div>
-        <div class="bar-container">
-            <div id="fill"></div>
-        </div>
-        <p style="font-size: 10px; margin-top: 10px;">VERSION 4.20 - SYSTEM BOOT</p>
-    </div>
-
-    <div id="app" style="display:none;">
-        <div class="winamp-container">
-            <div class="title-bar">
-                <span>SUMMA_MENU_PLAYER.EXE</span>
-                <div class="controls">_ □ X</div>
-            </div>
-            
-            <div class="action-bar">
-                <input type="file" id="excel-upload" accept=".xlsx" style="display:none;">
-                <button class="win-btn" onclick="document.getElementById('excel-upload').click()">LOAD MENU (.XLSX)</button>
-            </div>
-
-            <div id="menu-list">
-                <p style="text-align:center; padding-top:50px; color:#555;">NO MENU LOADED. <br>PLEASE UPLOAD EXCEL.</p>
-            </div>
-
-            <div class="footer">
-                <button class="order-btn" onclick="sendEmail()">SEND ORDER VIA EMAIL</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
-</body>
-</html>
+<div class="action-bar" id="admin-zone" style="display: none !important;">
+    <input type="file" id="excel-upload" accept=".xlsx" style="display:none;">
+    <button class="win-btn" onclick="document.getElementById('excel-upload').click()">🛠 ADMIN: UPDATE</button>
+</div>
