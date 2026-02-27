@@ -27,10 +27,6 @@
         .check { width: 30px; height: 30px; border: 2px solid #333; appearance: none; cursor: pointer; border-radius: 3px; position: relative; background: #000; flex-shrink: 0;}
         .check:checked { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 15px var(--gold); }
         .check:checked::after { content: "OK"; position: absolute; bottom: -12px; left: 3px; font-size: 7px; color: var(--gold); font-weight: bold; }
-        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 11000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-box { background: #0a0a0a; border: 1px solid var(--gold); width: 100%; max-width: 360px; padding: 30px; }
-        .label { color: var(--gold); font-size: 9px; margin-top: 15px; font-weight: bold; }
-        .val { color: #eee; font-size: 16px; border-bottom: 1px solid #222; padding-bottom: 5px; }
         .footer { padding: 15px; background: #000; border-top: 1px solid var(--gold); display: flex; gap: 10px; }
         .btn { flex: 3; padding: 20px; background: var(--gold); color: #000; border: none; font-weight: 900; cursor: pointer; font-family: inherit; }
         .btn-clear { flex: 1; background: #1a1a1a; color: #555; border: 1px solid #333; font-size: 9px; }
@@ -69,9 +65,9 @@
         function toggle(id) {
             playSfx(180, 'sine', 0.1);
             const el = document.getElementById(id);
-            const open = el.style.display === 'block';
+            const isOpen = el.style.display === 'block';
             document.querySelectorAll('.cat-box').forEach(c => c.style.display = 'none');
-            el.style.display = open ? 'none' : 'block';
+            el.style.display = isOpen ? 'none' : 'block';
         }
 
         function updateCount() {
@@ -107,7 +103,7 @@
                     cDiv.style.display = 'none';
 
                     let currentSub = "GENERAL";
-                    let idx = { s:-1, t:-1, h:-1, q:-1, l:-1, m:-1, p:-1 };
+                    let idx = { s:-1, t:-1, l:-1, q:-1, p:-1 };
 
                     data.forEach((row) => {
                         const cell0 = String(row[0] || "").toLowerCase();
@@ -124,32 +120,30 @@
                             cDiv.appendChild(sub);
                             return;
                         }
-                        if(row[idx.s] && idx.s !== -1 && row[idx.s].toLowerCase() !== 'strain') {
-                            const item = document.createElement('div');
-                            item.className = 'row';
-                            const strainName = String(row[idx.s]);
-                            
-                            // Direct attribute storage to avoid JSON mangling
-                            const checkbox = document.createElement('input');
-                            checkbox.type = 'checkbox';
-                            checkbox.className = 'check';
-                            checkbox.onchange = updateCount;
-                            checkbox.dataset.strain = strainName;
-                            checkbox.dataset.cat = sName;
-                            checkbox.dataset.sub = currentSub;
-                            checkbox.dataset.lot = row[idx.l] || 'N/A';
-                            checkbox.dataset.thc = row[idx.t] || 'N/A';
-                            checkbox.dataset.qty = row[idx.q] || 'N/A';
-                            checkbox.dataset.price = row[idx.p] || 'N/A';
+                        if(row[idx.s] && row[idx.s].toLowerCase() !== 'strain') {
+                            const strain = String(row[idx.s]);
+                            const lot = String(row[idx.l] || 'N/A');
+                            const thc = String(row[idx.t] || 'N/A');
+                            const weight = String(row[idx.q] || 'N/A');
+                            const price = String(row[idx.p] || 'N/A');
 
-                            item.appendChild(checkbox);
-                            item.innerHTML += `
+                            const rowEl = document.createElement('div');
+                            rowEl.className = 'row';
+                            rowEl.innerHTML = `
+                                <input type="checkbox" class="check" onchange="updateCount()" 
+                                    data-item="${strain}" 
+                                    data-cat="${sName}" 
+                                    data-sub="${currentSub}" 
+                                    data-lot="${lot}" 
+                                    data-thc="${thc}" 
+                                    data-qty="${weight}" 
+                                    data-prc="${price}">
                                 <div class="info" style="flex-grow:1; margin-left:15px;">
-                                    <div style="font-weight:bold; color:white; font-size:16px;">${strainName}</div>
-                                    <div style="font-size:10px; color:var(--gold); margin-top:5px;">THC:${row[idx.t]||'--'}% | PRICE:${row[idx.p]||'--'}</div>
+                                    <div style="font-weight:bold; color:white; font-size:16px;">${strain}</div>
+                                    <div style="font-size:10px; color:var(--gold); margin-top:5px;">THC:${thc}% | PRICE:${price}</div>
                                 </div>
                             `;
-                            cDiv.appendChild(item);
+                            cDiv.appendChild(rowEl);
                         }
                     });
                     list.appendChild(cDiv);
@@ -160,52 +154,50 @@
         }
 
         function send() {
-            const checks = Array.from(document.querySelectorAll('.check:checked'));
-            if(checks.length === 0) return;
+            const selected = document.querySelectorAll('.check:checked');
+            if(selected.length === 0) return;
             playSfx(900, 'sine', 0.2);
             
-            // Build the data structure manually
-            const structure = {};
-            checks.forEach(c => {
-                const cat = c.dataset.cat;
-                const sub = c.dataset.sub;
-                if(!structure[cat]) structure[cat] = {};
-                if(!structure[cat][sub]) structure[cat][sub] = [];
+            let manifest = {};
+
+            selected.forEach(el => {
+                const c = el.getAttribute('data-cat');
+                const s = el.getAttribute('data-sub');
                 
-                structure[cat][sub].push({
-                    strain: c.dataset.strain,
-                    lot: c.dataset.lot,
-                    thc: c.dataset.thc,
-                    qty: c.dataset.qty,
-                    price: c.dataset.price
+                if(!manifest[c]) manifest[c] = {};
+                if(!manifest[c][s]) manifest[c][s] = [];
+
+                manifest[c][s].push({
+                    name: el.getAttribute('data-item'),
+                    lot: el.getAttribute('data-lot'),
+                    thc: el.getAttribute('data-thc'),
+                    qty: el.getAttribute('data-qty'),
+                    prc: el.getAttribute('data-prc')
                 });
             });
 
-            let body = "--- SUMMA_WHOLESALE_ORDER_MANIFEST ---%0A%0A";
+            let body = "--- SUMMA_OS_WHOLESALE_ORDER ---%0A%0A";
             
-            for (const [catName, subCats] of Object.entries(structure)) {
-                body += `>>> CATEGORY: ${catName.toUpperCase()}%0A`;
-                body += `====================================%0A`;
-                
-                for (const [subName, items] of Object.entries(subCats)) {
-                    body += `[TYPE]: ${subName.toUpperCase()}%0A`;
-                    body += `------------------------------------%0A`;
-                    
-                    items.forEach(item => {
-                        body += `* ${item.strain.toUpperCase()}%0A`;
-                        body += `  LOT: ${item.lot} | THC: ${item.thc}%25%0A`;
-                        body += `  WEIGHT: ${item.qty} | PRICE: ${item.price}%0A%0A`;
+            for (const [cat, subObj] of Object.entries(manifest)) {
+                body += `>>> ${cat.toUpperCase()}%0A`;
+                body += `=================================%0A`;
+                for (const [subName, items] of Object.entries(subObj)) {
+                    body += `[TYPE]: ${subName}%0A`;
+                    items.forEach(i => {
+                        body += ` * ${i.name.toUpperCase()}%0A`;
+                        body += `   LOT: ${i.lot} | THC: ${i.thc}%25%0A`;
+                        body += `   QTY: ${i.qty} | PRICE: ${i.prc}%0A%0A`;
                     });
                 }
                 body += `%0A`;
             }
 
             const now = new Date();
-            body += `------------------------------------%0A`;
-            body += `MANIFEST_GENERATED: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}%0A`;
-            body += `SYSTEM_ID: @702WISH_V4%0A`;
+            body += `---------------------------------%0A`;
+            body += `MANIFEST_GENERATED: ${now.toLocaleString()}%0A`;
+            body += `SYSTEM_TAG: @702WISH_V4%0A`;
             
-            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Summa Wholesale Order&body=${body}`;
+            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Request (${selected.length} Items)&body=${body}`;
         }
 
         window.addEventListener('load', start);
