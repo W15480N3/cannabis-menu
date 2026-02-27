@@ -11,6 +11,7 @@
             --summa-gold-glow: rgba(238, 180, 59, 0.2);
             --summa-black: #050505;
             --summa-grey: #1a1a1a;
+            --summa-red: #ff4444; /* Added for error state */
         }
 
         html, body { 
@@ -54,14 +55,23 @@
         }
 
         .logo-bar { 
-            background: var(--summa-black); padding: 25px 10px; text-align: center; 
+            background: var(--summa-black); padding: 25px 10px 10px 10px; text-align: center; 
             border-bottom: 1px solid var(--summa-gold); flex-shrink: 0;
+            display: flex; flex-direction: column; align-items: center;
         }
         .logo-img { max-width: 250px; width: 80%; height: auto; animation: logoPulse 4s ease-in-out infinite; }
         @keyframes logoPulse { 0%, 100% { filter: drop-shadow(0 0 5px var(--summa-gold-glow)); transform: scale(1); } 50% { filter: drop-shadow(0 0 20px rgba(238, 180, 59, 0.4)); transform: scale(1.02); } }
 
+        /* CREATOR NOD (TOP) */
+        .creator-tag {
+            font-size: 8px; color: rgba(238, 180, 59, 0.4); 
+            letter-spacing: 2px; text-transform: uppercase; padding: 10px 0;
+            animation: ledBlink 6s infinite;
+        }
+        @keyframes ledBlink { 0%, 90%, 100% { opacity: 0.4; } 92%, 96% { opacity: 1; } 94% { opacity: 0.2; } }
+
         #menu-list { 
-            background: #000; flex-grow: 1; overflow-y: auto; margin: 5px 5px 0 5px; 
+            background: #000; flex-grow: 1; overflow-y: auto; margin: 0 5px 0 5px; 
             border-radius: 8px 8px 0 0; border: 1px solid #222; box-shadow: inset 0 0 20px var(--summa-gold-glow);
             -webkit-overflow-scrolling: touch;
         }
@@ -71,11 +81,8 @@
 
         .item-row { display: flex; align-items: center; padding: 14px; border-bottom: 1px solid #111; transition: background 0.3s; position: relative; overflow: hidden; }
         .item-row:active { background: rgba(238, 180, 59, 0.1); }
-        
-        /* Pulse when checked */
         .item-row input:checked + div { animation: textGlow 2s infinite; }
         @keyframes textGlow { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-
         .item-row input[type="checkbox"] { appearance: none; width: 22px; height: 22px; border: 1px solid var(--summa-gold); border-radius: 4px; margin-right: 15px; position: relative; }
         .item-row input:checked { background: var(--summa-gold); box-shadow: 0 0 10px var(--summa-gold); }
 
@@ -84,35 +91,33 @@
             padding: 10px 20px; padding-bottom: calc(15px + env(safe-area-inset-bottom)); 
             background: var(--summa-black); display: flex; flex-direction: column; gap: 8px;
             border-top: 1px solid var(--summa-gold); flex-shrink: 0; z-index: 10;
-            position: relative;
         }
-        
         .order-btn { 
             width: 100%; padding: 16px; background: var(--summa-gold); color: #000; 
-            border: none; border-radius: 4px; font-weight: 900; text-transform: uppercase;
+            border: none; border-radius: 4px; font-weight: 900; text-transform: uppercase; 
+            transition: all 0.2s;
             animation: btnBreath 3s infinite ease-in-out;
         }
         @keyframes btnBreath { 0%, 100% { box-shadow: 0 0 5px var(--summa-gold-glow); } 50% { box-shadow: 0 0 20px var(--summa-gold); } }
-
-        .creator-tag {
-            position: absolute; bottom: 4px; right: 8px; 
-            font-size: 7px; color: rgba(238, 180, 59, 0.3); 
-            letter-spacing: 1px; text-transform: uppercase; pointer-events: none;
-            animation: ledBlink 6s infinite;
+        
+        /* SHAKE ANIMATION */
+        .error-shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both !important;
+            background: var(--summa-red) !important;
+            box-shadow: 0 0 20px var(--summa-red) !important;
         }
-        @keyframes ledBlink { 0%, 90%, 100% { opacity: 0.3; } 92%, 96% { opacity: 1; } 94% { opacity: 0.1; } }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
+        .clear-btn { background: transparent; color: #777; border: 1px solid #333; padding: 8px; font-size: 11px; border-radius: 4px; text-transform: uppercase; }
 
         /* MODAL */
-        #confirm-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.92); z-index: 20000; justify-content: center; align-items: center;
-        }
-        .modal-box {
-            background: var(--summa-grey); border: 1px solid var(--summa-gold); padding: 25px; 
-            border-radius: 8px; text-align: center; box-shadow: 0 0 40px var(--summa-gold); 
-            width: 85%; max-width: 320px; box-sizing: border-box;
-            animation: modalSlide 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-        }
+        #confirm-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 20000; justify-content: center; align-items: center; }
+        .modal-box { background: var(--summa-grey); border: 1px solid var(--summa-gold); padding: 25px; border-radius: 8px; text-align: center; box-shadow: 0 0 40px var(--summa-gold); width: 85%; max-width: 320px; box-sizing: border-box; animation: modalSlide 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28); }
         @keyframes modalSlide { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     </style>
 </head>
@@ -140,12 +145,12 @@
     <div id="app">
         <div class="logo-bar">
             <img src="summa.webp" alt="SUMMA" class="logo-img">
+            <div class="creator-tag">TERMINAL FW: 702WISH-OS_V1.1</div>
         </div>
         <div id="menu-list"></div>
         <div class="footer">
-            <button class="order-btn" onclick="playBeep(440, 0.1); sendEmail()">CHECK AVAILABILITY</button>
+            <button id="order-btn" class="order-btn" onclick="sendEmail()">CHECK AVAILABILITY</button>
             <button class="clear-btn" onclick="clearSelections()">Clear Selections</button>
-            <div class="creator-tag">FW: 702WISH-OS_V1.0</div>
         </div>
     </div>
 
@@ -164,7 +169,6 @@
             osc.start(); osc.stop(audioCtx.currentTime + duration);
         }
 
-        // Glitch text effect for loader
         const phrases = ["INITIALIZING...", "DECRYPTING MENU...", "SYNCING STOCKS...", "LOADING SUMMA..."];
         let phraseIdx = 0;
         const loaderText = document.getElementById('loading-text');
@@ -294,9 +298,19 @@
         }
 
         function sendEmail() {
+            const btn = document.getElementById('order-btn');
             const checks = document.querySelectorAll('.order-check:checked');
-            if (checks.length === 0) return;
+            
+            if (checks.length === 0) {
+                // ERROR STATE
+                playBeep(100, 0.1); 
+                playBeep(80, 0.2);
+                btn.classList.add('error-shake');
+                setTimeout(() => btn.classList.remove('error-shake'), 400);
+                return;
+            }
 
+            playBeep(440, 0.1);
             let emailBody = "Checking availability for:%0A%0A";
             const categories = {};
             checks.forEach(c => {
