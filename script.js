@@ -1,19 +1,22 @@
 window.onload = () => {
-    // 1. Secret Admin Check
     const urlParams = new URLSearchParams(window.location.search);
+    // ONLY SHOW IF ?admin=true IS IN THE URL
     if (urlParams.get('admin') === 'true') {
         const adminBox = document.getElementById('admin-zone');
-        adminBox.style.setProperty("display", "block", "important");
+        if(adminBox) adminBox.style.setProperty("display", "block", "important");
     }
 
-    // 2. Load Screen Timer
     setTimeout(() => {
         document.getElementById('loader').style.display = 'none';
         document.getElementById('app').style.display = 'block';
         loadMenuFromFile();
     }, 3000);
 
-    document.getElementById('excel-upload').addEventListener('change', handleUpload);
+    document.getElementById('excel-upload').addEventListener('change', (e) => {
+        const reader = new FileReader();
+        reader.onload = (event) => processExcel(event.target.result);
+        reader.readAsArrayBuffer(e.target.files[0]);
+    });
 };
 
 async function loadMenuFromFile() {
@@ -23,14 +26,8 @@ async function loadMenuFromFile() {
         const buffer = await response.arrayBuffer();
         processExcel(buffer);
     } catch (err) {
-        document.getElementById('menu-list').innerHTML = "<p style='color:white; padding:20px;'>UPLOAD menu.xlsx VIA ADMIN LINK</p>";
+        document.getElementById('menu-list').innerHTML = "<p style='color:#fff; padding:20px; text-align:center;'>NO MENU LOADED.<br>PLEASE USE ADMIN LINK TO UPLOAD.</p>";
     }
-}
-
-function handleUpload(e) {
-    const reader = new FileReader();
-    reader.onload = (event) => processExcel(event.target.result);
-    reader.readAsArrayBuffer(e.target.files[0]);
 }
 
 function processExcel(buffer) {
@@ -42,14 +39,17 @@ function processExcel(buffer) {
     workbook.SheetNames.forEach((sheetName, sIdx) => {
         const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {header: 1});
         
-        // Create Main Category Button
+        // 1. Create the Collapsible Category Button
         const btn = document.createElement('button');
         btn.className = "category-btn";
         btn.innerHTML = `📁 ${sheetName.toUpperCase()}`;
-        btn.onclick = () => toggleCategory(`content-${sIdx}`);
+        btn.onclick = () => {
+            const content = document.getElementById(`content-${sIdx}`);
+            content.style.display = (content.style.display === "block") ? "none" : "block";
+        };
         list.appendChild(btn);
 
-        // Create Container for Content
+        // 2. Create the hidden container
         const contentDiv = document.createElement('div');
         contentDiv.id = `content-${sIdx}`;
         contentDiv.className = "category-content";
@@ -64,24 +64,23 @@ function processExcel(buffer) {
                 return;
             }
 
-            // Section Headers (Titles like "Chubbies")
+            // Identify Section Titles
             if (row[0] && !row[thcIdx] && !row[priceIdx] && row[0] !== "Strain") {
                 const head = document.createElement('div');
                 head.className = "section-header";
                 head.innerText = `> ${row[0]}`;
                 contentDiv.appendChild(head);
-                return;
             }
 
-            // Items
-            if (strainIdx > -1 && row[strainIdx]) {
+            // Identify Products
+            if (strainIdx > -1 && row[strainIdx] && row[strainIdx] !== "Strain") {
                 const rowDiv = document.createElement('div');
                 rowDiv.className = 'item-row';
                 rowDiv.innerHTML = `
                     <input type="checkbox" class="order-check" value="${row[strainIdx]} (${sheetName})">
                     <div class="item-info">
-                        <span class="strain">${row[strainIdx]}</span>
-                        <span class="details">THC: ${row[thcIdx] || '??'}% | $${row[priceIdx] || 'TBD'}</span>
+                        <span style="font-weight:bold;">${row[strainIdx]}</span>
+                        <span class="details">THC: ${row[thcIdx] || '??'}% | Price: $${row[priceIdx] || 'TBD'}</span>
                     </div>
                 `;
                 contentDiv.appendChild(rowDiv);
@@ -91,20 +90,10 @@ function processExcel(buffer) {
     });
 }
 
-function toggleCategory(id) {
-    const content = document.getElementById(id);
-    const isOpen = content.style.display === "block";
-    
-    // Close all others first (optional, for a cleaner look)
-    document.querySelectorAll('.category-content').forEach(el => el.style.display = "none");
-    
-    content.style.display = isOpen ? "none" : "block";
-}
-
 function sendEmail() {
     const selected = document.querySelectorAll('.order-check:checked');
-    if (selected.length === 0) { alert("Select items first!"); return; }
-    let body = "Order Inquiry:%0D%0A%0D%0A";
+    if (selected.length === 0) { alert("Select some items first!"); return; }
+    let body = "New Order Inquiry:%0D%0A%0D%0A";
     selected.forEach(box => { body += "- " + box.value + "%0D%0A"; });
-    window.location.href = `mailto:sales@summacannabis.com?subject=WHOLESALE_ORDER&body=${body}`;
+    window.location.href = `mailto:sales@summacannabis.com?subject=ORDER_REQUEST&body=${body}`;
 }
