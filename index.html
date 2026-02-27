@@ -12,55 +12,70 @@
         #loader { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--summa-black); z-index: 10000; }
         #app { display: none; width: 100%; height: 100dvh; max-width: 450px; margin: 0 auto; background: var(--summa-grey); flex-direction: column; }
 
-        .search-container { padding: 10px; background: #000; border-bottom: 1px solid #333; }
-        #strain-search { width: 100%; padding: 12px; background: #111; border: 1px solid var(--summa-gold); color: var(--summa-gold); font-family: inherit; box-sizing: border-box; border-radius: 4px; outline: none; }
-
-        .logo-bar { background: var(--summa-black); padding: 15px 10px; text-align: center; border-bottom: 1px solid var(--summa-gold); flex-shrink: 0; }
-        .logo-img { max-width: 180px; width: 50%; height: auto; }
+        .logo-bar { background: var(--summa-black); padding: 25px 10px; text-align: center; border-bottom: 1px solid var(--summa-gold); flex-shrink: 0; }
+        .logo-img { max-width: 220px; width: 70%; height: auto; }
         
         #menu-list { background: #000; flex-grow: 1; overflow-y: auto; margin: 0 5px; border: 1px solid #222; -webkit-overflow-scrolling: touch; }
         
-        /* CATEGORY STYLING */
-        .category-header { background: #222; color: var(--summa-gold); padding: 10px 15px; font-weight: bold; font-size: 14px; text-transform: uppercase; border-bottom: 1px solid #444; margin-top: 5px; cursor: pointer; display: flex; justify-content: space-between; }
-        .category-content { display: none; } /* Collapsed by default */
+        /* CATEGORY DROPDOWNS */
+        .category-header { 
+            background: var(--summa-grey); color: var(--summa-gold); 
+            padding: 18px 15px; font-weight: bold; font-size: 14px; 
+            text-transform: uppercase; border-bottom: 1px solid #222; 
+            cursor: pointer; display: flex; justify-content: space-between; 
+        }
+        .category-content { display: none; background: #050505; }
 
-        .item-row { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #111; }
-        .item-info { flex-grow: 1; margin-left: 10px; cursor: pointer; }
-        .order-check { appearance: none; width: 24px; height: 24px; border: 1px solid var(--summa-gold); border-radius: 3px; flex-shrink: 0; cursor: pointer; }
-        .order-check:checked { background: var(--summa-gold); }
+        .item-row { display: flex; align-items: center; padding: 14px; border-bottom: 1px solid #111; }
+        .item-info { flex-grow: 1; margin-left: 12px; cursor: pointer; }
+        
+        .order-check { appearance: none; width: 24px; height: 24px; border: 1px solid var(--summa-gold); border-radius: 3px; flex-shrink: 0; cursor: pointer; transition: 0.2s; }
+        .order-check:checked { background: var(--summa-gold); box-shadow: 0 0 10px var(--summa-gold); }
 
+        /* DETAIL MODAL */
         #detail-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; justify-content: center; align-items: center; padding: 20px; }
-        .detail-box { background: var(--summa-grey); border: 1px solid var(--summa-gold); width: 90%; max-width: 320px; padding: 20px; border-radius: 4px; }
-        .detail-label { color: var(--summa-gold); font-size: 10px; text-transform: uppercase; margin-top: 10px; }
-        .detail-val { color: #fff; font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 2px; margin-bottom: 4px; word-break: break-all; }
+        .detail-box { 
+            background: var(--summa-grey); border: 1px solid var(--summa-gold); 
+            width: 100%; max-width: 320px; padding: 25px; border-radius: 4px; 
+            box-shadow: 0 0 40px rgba(238, 180, 59, 0.1);
+        }
+        .detail-label { color: var(--summa-gold); font-size: 9px; text-transform: uppercase; margin-top: 15px; letter-spacing: 1px; }
+        .detail-val { color: #fff; font-size: 15px; border-bottom: 1px solid #333; padding-bottom: 4px; margin-bottom: 2px; word-break: break-all; }
 
         .footer { padding: 15px; background: var(--summa-black); border-top: 1px solid var(--summa-gold); flex-shrink: 0; }
-        .order-btn { width: 100%; padding: 16px; background: var(--summa-gold); color: #000; border: none; border-radius: 4px; font-weight: 900; font-family: inherit; }
+        .order-btn { width: 100%; padding: 18px; background: var(--summa-gold); color: #000; border: none; border-radius: 4px; font-weight: 900; font-family: inherit; font-size: 14px; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <div style="color: var(--summa-gold); font-size: 12px; letter-spacing: 2px;">RE-INITIALIZING...</div>
+        <div style="color: var(--summa-gold); font-size: 11px; letter-spacing: 3px;">FETCHING SECURE DATA...</div>
     </div>
 
     <div id="detail-overlay" onclick="closeDetail()">
         <div class="detail-box" onclick="event.stopPropagation()">
-            <div id="det-strain" style="color:var(--summa-gold); font-weight:bold; font-size:18px; border-bottom: 1px solid var(--summa-gold); padding-bottom:10px; margin-bottom:10px;">NAME</div>
-            <div class="detail-label">METRC ID</div><div id="det-metrc" class="detail-val">--</div>
+            <div id="det-strain" style="color:var(--summa-gold); font-weight:bold; font-size:20px; border-bottom: 2px solid var(--summa-gold); padding-bottom:10px; margin-bottom:10px;">STRAIN</div>
+            
+            <div class="detail-label">METRC ID #</div><div id="det-metrc" class="detail-val">--</div>
             <div class="detail-label">LOT NUMBER</div><div id="det-lot" class="detail-val">--</div>
-            <div class="detail-label">HARVEST DATE</div><div id="det-harvest" class="detail-val">--</div>
-            <div class="detail-label">QUANTITY</div><div id="det-qty" class="detail-val">--</div>
-            <div class="detail-label">THC %</div><div id="det-thc" class="detail-val">--</div>
-            <button onclick="closeDetail()" style="width:100%; margin-top:20px; padding:12px; background:#333; color:#fff; border:none; font-family:inherit;">CLOSE</button>
+            
+            <div style="display: flex; gap: 15px;">
+                <div style="flex: 1;">
+                    <div class="detail-label">HARVEST DATE</div><div id="det-harvest" class="detail-val">--</div>
+                </div>
+                <div style="flex: 1;">
+                    <div class="detail-label">STOCK QTY</div><div id="det-qty" class="detail-val">--</div>
+                </div>
+            </div>
+
+            <div class="detail-label">POTENCY (THC%)</div><div id="det-thc" class="detail-val">--</div>
+            
+            <button onclick="closeDetail()" style="width:100%; margin-top:25px; padding:12px; background:transparent; border:1px solid #444; color:#888; font-family:inherit; cursor:pointer;">RETURN</button>
         </div>
     </div>
 
     <div id="app">
         <div class="logo-bar"><img src="summa.webp" alt="SUMMA" class="logo-img"></div>
-        <div class="search-container">
-            <input type="text" id="strain-search" placeholder="SEARCH INVENTORY..." onkeyup="filterStrains()">
-        </div>
         <div id="menu-list"></div>
         <div class="footer">
             <button class="order-btn" onclick="sendEmail()">CHECK AVAILABILITY <span id="count-badge"></span></button>
@@ -68,20 +83,11 @@
     </div>
 
     <script>
-        function filterStrains() {
-            let input = document.getElementById('strain-search').value.toLowerCase();
-            document.querySelectorAll('.item-row').forEach(row => {
-                row.style.display = row.innerText.toLowerCase().includes(input) ? "flex" : "none";
-            });
-            // Auto-expand sections when searching
-            document.querySelectorAll('.category-content').forEach(c => {
-                if(input.length > 0) c.style.display = 'block';
-            });
-        }
-
         function toggleCat(id) {
             const c = document.getElementById(id);
-            c.style.display = (c.style.display === 'block') ? 'none' : 'block';
+            const isOpen = c.style.display === 'block';
+            document.querySelectorAll('.category-content').forEach(el => el.style.display = 'none');
+            c.style.display = isOpen ? 'none' : 'block';
         }
 
         function showDetail(strain, metrc, lot, harvest, qty, thc) {
@@ -89,7 +95,7 @@
             document.getElementById('det-metrc').innerText = metrc || 'N/A';
             document.getElementById('det-lot').innerText = lot || 'N/A';
             document.getElementById('det-harvest').innerText = harvest || 'N/A';
-            document.getElementById('det-qty').innerText = qty || 'N/A';
+            document.getElementById('det-qty').innerText = qty || 'INQUIRE';
             document.getElementById('det-thc').innerText = thc || 'N/A';
             document.getElementById('detail-overlay').style.display = 'flex';
         }
@@ -99,7 +105,7 @@
         async function loadMenu() {
             try {
                 const resp = await fetch('menu.xlsx');
-                if (!resp.ok) throw new Error("File not found");
+                if (!resp.ok) throw new Error("Missing menu.xlsx");
                 
                 const buf = await resp.arrayBuffer();
                 const wb = XLSX.read(new Uint8Array(buf), {type: 'array'});
@@ -110,22 +116,22 @@
                     if (rows.length < 2) return;
 
                     const catId = 'cat-' + idx;
-                    const catHeader = document.createElement('div');
-                    catHeader.className = "category-header";
-                    catHeader.innerHTML = `<span>${name.toUpperCase()}</span><span>+</span>`;
-                    catHeader.onclick = () => toggleCat(catId);
-                    list.appendChild(catHeader);
+                    const header = document.createElement('div');
+                    header.className = "category-header";
+                    header.innerHTML = `<span>${name.toUpperCase()}</span><span>+</span>`;
+                    header.onclick = () => toggleCat(catId);
+                    list.appendChild(header);
 
                     const cont = document.createElement('div');
                     cont.id = catId;
                     cont.className = 'category-content';
 
                     const hRow = rows[0];
-                    // SUPER-SAFE FINDER: Removes #, *, spaces and compares lowercase
+                    // Scrub headers to be symbol-blind
                     const f = (keys) => hRow.findIndex(col => {
                         if (!col) return false;
-                        const cleanCol = String(col).replace(/[#*_\s]/g, '').toLowerCase();
-                        return keys.some(k => cleanCol.includes(k.toLowerCase()));
+                        const clean = String(col).replace(/[#*_\s]/g, '').toLowerCase();
+                        return keys.some(k => clean.includes(k.toLowerCase()));
                     });
 
                     const sI = f(['strain']);
@@ -142,8 +148,8 @@
                         row.innerHTML = `
                             <input type="checkbox" class="order-check" data-strain="${r[sI]}">
                             <div class="item-info" onclick="showDetail('${r[sI]}','${r[mI]||''}','${r[lI]||''}','${r[hI]||''}','${r[qI]||''}','${r[tI]||''}')">
-                                <div style="font-weight:bold; color:#fff;">${r[sI]}</div>
-                                <div style="font-size:10px; color:var(--summa-gold);">THC: ${r[tI]||'N/A'}% | DATA ></div>
+                                <div style="font-weight:bold; color:#fff; font-size:15px;">${r[sI]}</div>
+                                <div style="font-size:10px; color:var(--summa-gold); margin-top:3px;">THC: ${r[tI]||'N/A'}% | TAP FOR DATA</div>
                             </div>
                         `;
                         row.querySelector('.order-check').onchange = () => {
@@ -157,14 +163,14 @@
                 document.getElementById('loader').style.display='none'; 
                 document.getElementById('app').style.display='flex';
             } catch (err) { 
-                document.getElementById('loader').innerText = "LOAD ERROR: CHECK FILENAME.";
+                document.getElementById('loader').innerText = "SYSTEM ERROR: RELOAD APP";
             }
         }
 
         function sendEmail() {
             const checks = document.querySelectorAll('.order-check:checked');
             if (checks.length === 0) return;
-            let body = "Summa Wholesale Inquiry:%0A%0A";
+            let body = "Availability Inquiry:%0A%0A";
             checks.forEach(c => body += `- ${c.dataset.strain}%0A`);
             window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Request&body=${body}`;
         }
