@@ -1,12 +1,87 @@
-body { background: #000; color: #0f0; font-family: monospace; overflow-x: hidden; }
-#loader { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-.bar { width: 200px; height: 10px; border: 1px solid #0f0; margin-top: 10px; }
-#fill { height: 100%; background: #0f0; width: 0%; animation: load 3s forwards; }
-@keyframes load { to { width: 100%; } }
-
-.winamp-window { 
-    width: 90%; max-width: 400px; margin: 20px auto; 
-    border: 3px solid #777; background: #c0c0c0; color: #000; 
+/* General Cyber Vibes */
+body {
+    background-color: #000;
+    color: #00ff00;
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+    overflow: hidden;
 }
-.title-bar { background: darkblue; color: white; padding: 5px; font-weight: bold; }
-button { width: 100%; padding: 15px; background: #0f0; border: 2px solid #000; font-weight: bold; }
+
+/* Loading Screen */
+#loader {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #000;
+}
+
+.glitch { font-size: 18px; font-weight: bold; animation: flicker 0.1s infinite; }
+
+.bar-container { width: 250px; height: 15px; border: 2px solid #00ff00; padding: 2px; margin-top: 10px; }
+#fill { height: 100%; background: #00ff00; width: 0%; animation: load 3s forwards; }
+
+@keyframes load { to { width: 100%; } }
+@keyframes flicker { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+/* The App Window */
+.winamp-container {
+    width: 95vw;
+    height: 90vh;
+    margin: 5vh auto;
+    background: #c0c0c0; /* Classic Gray */
+    border: 3px solid #fff;
+    border-right-color: #555;
+    border-bottom-color: #555;
+    display: flex;
+    flex-direction: column;
+}
+
+.title-bar {
+    background: linear-gradient(90deg, #000080, #0878c0);
+    color: white;
+    padding: 4px 8px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+}
+
+#menu-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    background: #000;
+    margin: 5px;
+    border: 2px inset #fff;
+    padding: 10px;
+}
+
+/* Individual Item Look */
+.item-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 5px;
+    border-bottom: 1px solid #111;
+}
+
+.item-row input[type="checkbox"] {
+    width: 25px; height: 25px; margin-right: 15px;
+}
+
+.item-info { display: flex; flex-direction: column; }
+.strain { font-weight: bold; font-size: 16px; color: #fff; }
+.details { font-size: 12px; color: #00ff00; }
+
+/* Buttons */
+.win-btn, .order-btn {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    border: 2px solid #fff;
+    border-right-color: #000;
+    border-bottom-color: #000;
+    padding: 10px;
+}
+
+.order-btn {
+    width: 100%; background: #00ff00; color: #000; font-size: 18px;
+}
