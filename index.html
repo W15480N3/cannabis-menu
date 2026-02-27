@@ -3,77 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SUMMA WHOLESALE</title>
+    <title>SUMMA WHOLESALE OS</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        :root { --gold: #eeb43b; --bg: #050505; --card: #1a1a1a; --sub: #2a2a2a; }
+        :root { --gold: #eeb43b; --bg: #050505; --card: #111111; --sub: #1a1a1a; --glitch: rgba(238, 180, 59, 0.15); }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: #d1d1d1; font-family: 'Courier New', monospace; margin: 0; padding: 0; height: 100dvh; overflow: hidden; }
         
-        #loader { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--bg); z-index: 10000; color: var(--gold); }
+        body { 
+            background: var(--bg); 
+            color: #d1d1d1; 
+            font-family: 'Courier New', monospace; 
+            margin: 0; padding: 0; 
+            height: 100dvh; overflow: hidden; 
+            background-image: linear-gradient(var(--glitch) 1px, transparent 1px), linear-gradient(90deg, var(--glitch) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* CRT SCANLINE OVERLAY */
+        body::after {
+            content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 9999; background-size: 100% 3px, 3px 100%; pointer-events: none;
+        }
+
+        #loader { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--bg); z-index: 10000; }
         
-        /* AUTHENTIC CANNABIS LEAF SVG */
-        .leaf-svg { width: 100px; height: 100px; fill: var(--gold); filter: drop-shadow(0 0 15px var(--gold)); animation: pulse 2s ease-in-out infinite; margin-bottom: 25px; }
-        @keyframes pulse { 0%, 100% { transform: scale(0.9); opacity: 0.3; } 50% { transform: scale(1.1); opacity: 1; } }
+        .leaf-svg { 
+            width: 130px; height: 130px; fill: var(--gold); 
+            filter: drop-shadow(0 0 25px var(--gold)); 
+            animation: pulse 1.5s ease-in-out infinite, flicker 4s infinite; 
+            margin-bottom: 25px; 
+        }
+
+        @keyframes pulse { 0%, 100% { transform: scale(0.9); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } }
+        @keyframes flicker { 0% { opacity: 1; } 2% { opacity: 0.4; } 4% { opacity: 0.9; } 50% { opacity: 1; } 51% { opacity: 0.2; } 53% { opacity: 0.8; } }
         
-        .loading-text { font-size: 12px; letter-spacing: 5px; text-transform: uppercase; font-weight: bold; }
+        .loading-text { font-size: 11px; letter-spacing: 5px; text-transform: uppercase; font-weight: bold; color: var(--gold); }
+        .ticker { font-size: 9px; color: #555; margin-top: 15px; height: 15px; }
 
-        #app { display: none; width: 100%; height: 100dvh; max-width: 450px; margin: 0 auto; background: var(--card); flex-direction: column; }
-        .logo-bar { background: var(--bg); padding: 25px 15px; text-align: center; border-bottom: 1px solid var(--gold); }
-        .logo-img { max-width: 200px; width: 65%; }
+        #app { display: none; width: 100%; height: 100dvh; max-width: 450px; margin: 0 auto; background: rgba(5, 5, 5, 0.96); flex-direction: column; position: relative; }
         
-        #menu-list { background: #000; flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-        .cat-header { background: #111; color: var(--gold); padding: 22px; font-weight: 900; border-bottom: 1px solid #222; cursor: pointer; display: flex; justify-content: space-between; font-size: 16px; text-transform: uppercase; }
-        .sub-section-title { background: var(--sub); color: #fff; padding: 10px 15px; font-size: 11px; font-weight: bold; border-bottom: 1px solid #444; text-transform: uppercase; }
-        .cat-box { display: none; background: #050505; }
+        /* LOGO BAR WITH TAGS */
+        .logo-bar { background: #000; padding: 35px 15px; text-align: center; border-bottom: 2px solid var(--gold); position: relative; }
+        .creator-tag { position: absolute; top: 8px; left: 12px; font-size: 9px; color: #555; letter-spacing: 1px; }
+        .status-tag { position: absolute; top: 8px; right: 12px; font-size: 9px; color: #0f0; letter-spacing: 1px; animation: blink 2s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .logo-img { max-width: 190px; width: 65%; filter: drop-shadow(0 0 8px rgba(238, 180, 59, 0.3)); }
+        
+        #menu-list { flex-grow: 1; overflow-y: auto; padding-bottom: 80px; scroll-behavior: smooth; }
+        
+        .cat-header { 
+            background: #0d0d0d; color: var(--gold); padding: 22px; font-weight: 900; 
+            border-bottom: 1px solid #222; cursor: pointer; display: flex; justify-content: space-between; 
+            font-size: 15px; text-transform: uppercase; letter-spacing: 2px;
+        }
+        
+        .sub-section-title { background: #151515; color: #666; padding: 12px 18px; font-size: 10px; border-bottom: 1px solid #222; letter-spacing: 4px; font-weight: bold; }
 
-        .row { display: flex; align-items: center; padding: 18px 15px; border-bottom: 1px solid #111; width: 100%; }
-        .info { flex-grow: 1; margin-left: 15px; cursor: pointer; }
-        .check { width: 30px; height: 30px; border: 2px solid var(--gold); appearance: none; cursor: pointer; flex-shrink: 0; border-radius: 4px; }
-        .check:checked { background: var(--gold); }
+        .row { display: flex; align-items: center; padding: 22px 15px; border-bottom: 1px solid #111; position: relative; }
+        .row:active { background: #1a1a1a; }
+        
+        .check { 
+            width: 30px; height: 30px; border: 2px solid #333; appearance: none; cursor: pointer; border-radius: 3px; 
+            transition: 0.2s; position: relative; background: #000;
+        }
+        .check:checked { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 15px var(--gold); }
+        .check:checked::after { content: "LOCKED"; position: absolute; bottom: -12px; left: -5px; font-size: 7px; color: var(--gold); font-weight: bold; }
 
-        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 11000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-box { background: #1a1a1a; border: 1px solid var(--gold); width: 100%; max-width: 350px; padding: 25px; border-radius: 4px; }
-        .label { color: var(--gold); font-size: 9px; margin-top: 14px; font-weight: bold; text-transform: uppercase; }
-        .val { color: #fff; font-size: 15px; border-bottom: 1px solid #333; padding-bottom: 4px; margin-bottom: 2px; }
+        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 11000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-box { background: #0a0a0a; border: 1px solid var(--gold); width: 100%; max-width: 360px; padding: 30px; box-shadow: 0 0 50px rgba(0,0,0,1); }
+        
+        .label { color: var(--gold); font-size: 9px; margin-top: 15px; font-weight: bold; letter-spacing: 1px; opacity: 0.8; }
+        .val { color: #eee; font-size: 16px; border-bottom: 1px solid #222; padding-bottom: 5px; margin-bottom: 3px; font-family: 'Courier New', monospace; }
 
-        .footer { padding: 18px; background: var(--bg); border-top: 1px solid var(--gold); }
-        .btn { width: 100%; padding: 20px; background: var(--gold); color: #000; border: none; font-weight: 900; font-family: inherit; cursor: pointer; text-transform: uppercase; }
+        .footer { padding: 15px; background: #000; border-top: 1px solid var(--gold); display: flex; gap: 10px; }
+        .btn { flex: 3; padding: 20px; background: var(--gold); color: #000; border: none; font-weight: 900; cursor: pointer; letter-spacing: 3px; font-family: inherit; }
+        .btn-clear { flex: 1; background: #1a1a1a; color: #555; border: 1px solid #333; font-size: 9px; font-weight: bold; }
+
+        /* GLITCH SHAKE ANIMATION */
+        .glitch-hit { animation: shake 0.2s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <svg class="leaf-svg" viewBox="0 0 512 512">
-            <path d="M495.9,235.3c-23.7-29.2-80.5-62.2-121.2-67.9c32.4-38,62.8-86.3,64.2-89c5-9.1,1.7-20.5-7.4-25.5c-9.1-5-20.5-1.7-25.5,7.4 c-0.6,1-27.1,46.1-56.5,82.4c-0.2-31.5,1.2-84.3,1.2-84.3c0.4-10.4-7.7-19-18.1-19.4c-10.4-0.4-19,7.7-19.4,18.1 c-0.1,1.9-0.8,31.7-1.1,70.6c-28-36.9-63.5-73-63.5-73c-7.3-7.5-19.2-7.7-26.6-0.3c-7.5,7.3-7.7,19.2-0.3,26.6 c0.3,0.3,31,31.6,56.6,62.4c-41.2,2.3-95.2,16.5-131.7,39.9c-8.9,5.7-11.5,17.5-5.8,26.4c5.7,8.9,17.5,11.5,26.4,5.8 c30.6-19.6,77.5-31.8,113.3-33.8c-23.6,33.1-47.5,84.4-48.5,87.6c-3.1,10,2.6,20.6,12.6,23.7s20.6-2.6,23.7-12.6 c0.4-1.2,19.7-47.3,39.3-81.6c17.5,23.1,38.9,64.5,38.9,64.5c4.7,9.3,16.1,13.1,25.4,8.3s13.1-16.1,8.3-25.4 c-0.4-0.8-17.2-31.7-32-55.6c43.4,8.9,89.5,41.9,112.9,69.5c6.5,7.7,18.1,8.6,25.7,2.1C500.5,260.6,501.4,249,494.9,241.4 C495.2,241.1,495.6,238.2,495.9,235.3z M167.3,367.6l-37.1-71.1l-71.1-37.1l71.1-37.1l37.1-71.1l37.1,71.1l71.1,37.1l-71.1,37.1 L167.3,367.6z"/>
-        </svg>
-        <div class="loading-text" id="status">INITIALIZING CANNABIS...</div>
+        <svg class="leaf-svg" viewBox="0 0 512 512"><path d="M495.9,235.3c-23.7-29.2-80.5-62.2-121.2-67.9c32.4-38,62.8-86.3,64.2-89c5-9.1,1.7-20.5-7.4-25.5c-9.1-5-20.5-1.7-25.5,7.4 c-0.6,1-27.1,46.1-56.5,82.4c-0.2-31.5,1.2-84.3,1.2-84.3c0.4-10.4-7.7-19-18.1-19.4c-10.4-0.4-19,7.7-19.4,18.1 c-0.1,1.9-0.8,31.7-1.1,70.6c-28-36.9-63.5-73-63.5-73c-7.3-7.5-19.2-7.7-26.6-0.3c-7.5,7.3-7.7,19.2-0.3,26.6 c0.3,0.3,31,31.6,56.6,62.4c-41.2,2.3-95.2,16.5-131.7,39.9c-8.9,5.7-11.5,17.5-5.8,26.4c5.7,8.9,17.5,11.5,26.4,5.8 c30.6-19.6,77.5-31.8,113.3-33.8c-23.6,33.1-47.5,84.4-48.5,87.6c-3.1,10,2.6,20.6,12.6,23.7s20.6-2.6,23.7-12.6 c0.4-1.2,19.7-47.3,39.3-81.6c17.5,23.1,38.9,64.5,38.9,64.5c4.7,9.3,16.1,13.1,25.4,8.3s13.1-16.1,8.3-25.4 c-0.4-0.8-17.2-31.7-32-55.6c43.4,8.9,89.5,41.9,112.9,69.5c6.5,7.7,18.1,8.6,25.7,2.1C500.5,260.6,501.4,249,494.9,241.4 C495.2,241.1,495.6,238.2,495.9,235.3z M167.3,367.6l-37.1-71.1l-71.1-37.1l71.1-37.1l37.1-71.1l37.1,71.1l71.1,37.1l-71.1,37.1 L167.3,367.6z"/></svg>
+        <div class="loading-text">INITIALIZING SUMMA_OS</div>
+        <div class="ticker" id="ticker">ENCRYPTED_LINK_ESTABLISHED...</div>
     </div>
 
-    <div id="modal" onclick="this.style.display='none'">
-        <div class="modal-box" onclick="event.stopPropagation()">
-            <div id="m-strain" style="color:var(--gold); font-weight:bold; font-size:22px; border-bottom: 2px solid var(--gold); padding-bottom:10px; margin-bottom:15px;">--</div>
-            <div class="label">METRC ID #</div><div id="m-metrc" class="val">--</div>
-            <div class="label">LOT NUMBER</div><div id="m-lot" class="val">--</div>
-            <div class="label">HARVEST DATE</div><div id="m-harvest" class="val">--</div>
-            <div class="label">FULL WEIGHT</div><div id="m-qty" class="val">--</div>
-            <div class="label">POTENCY (THC%)</div><div id="m-thc" class="val">--</div>
-            <div class="label">UNIT PRICE</div><div id="m-price" class="val">--</div>
-            <button onclick="document.getElementById('modal').style.display='none'" style="width:100%; margin-top:25px; padding:12px; background:#333; color:white; border:none; font-family:inherit; cursor:pointer;">RETURN</button>
+    <div id="modal" onclick="closeModal()">
+        <div class="modal-box" id="modal-box" onclick="event.stopPropagation()">
+            <div id="m-strain" style="color:var(--gold); font-weight:bold; font-size:24px; border-bottom: 2px solid var(--gold); padding-bottom:10px; margin-bottom:20px; text-transform:uppercase;">--</div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div><div class="label">METRC_ID</div><div id="m-metrc" class="val">--</div></div>
+                <div><div class="label">LOT_NUM</div><div id="m-lot" class="val">--</div></div>
+                <div><div class="label">HARVEST_DT</div><div id="m-harvest" class="val">--</div></div>
+                <div><div class="label">CUR_WEIGHT</div><div id="m-qty" class="val">--</div></div>
+                <div><div class="label">THC_CONTENT</div><div id="m-thc" class="val" style="color:#0f0; font-weight:bold;">--</div></div>
+                <div><div class="label">EST_PRICE</div><div id="m-price" class="val" style="color:var(--gold); font-weight:bold;">--</div></div>
+            </div>
+            <button onclick="closeModal()" style="width:100%; margin-top:30px; padding:15px; background:#111; color:#fff; border:1px solid #444; font-family:inherit; cursor:pointer; letter-spacing:2px;">CLOSE_NODE</button>
         </div>
     </div>
 
     <div id="app">
-        <div class="logo-bar"><img src="summa.webp" alt="SUMMA" class="logo-img"></div>
+        <div class="logo-bar">
+            <span class="creator-tag">DEV_ID: @702WISH</span>
+            <span class="status-tag">● V4_LINK_ACTIVE</span>
+            <img src="summa.webp" alt="SUMMA" class="logo-img">
+        </div>
         <div id="menu-list"></div>
         <div class="footer">
-            <button class="btn" onclick="send()">REQUEST QUOTE <span id="count"></span></button>
+            <button class="btn btn-clear" onclick="clearCart()">WIPE_ALL</button>
+            <button class="btn" onclick="send()">SUBMIT_QUOTE <span id="count"></span></button>
         </div>
     </div>
 
     <script>
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSfx(f, t, d, g=0.1) {
+        function playSfx(f, t, d, g=0.04) {
             const o = ctx.createOscillator(); const v = ctx.createGain();
             o.type = t; o.frequency.setValueAtTime(f, ctx.currentTime);
             v.gain.setValueAtTime(g, ctx.currentTime);
@@ -82,24 +132,55 @@
             o.start(); o.stop(ctx.currentTime + d);
         }
 
+        const tickerLines = [
+            "SCANNING_METRC_FILES...", "DECRYPTING_LAB_RESULTS...", "PARSING_STRAIN_GENETICS...", 
+            "MAPPING_LOT_QUANTITIES...", "ESTABLISHING_SECURE_NODE...", "READY."
+        ];
+        let tIdx = 0;
+        setInterval(() => {
+            if(tIdx < tickerLines.length) {
+                document.getElementById('ticker').innerText = tickerLines[tIdx];
+                tIdx++;
+            }
+        }, 500);
+
         function toggle(id) {
-            playSfx(150, 'sine', 0.1, 0.05);
+            playSfx(180, 'sine', 0.1);
             const el = document.getElementById(id);
             const open = el.style.display === 'block';
             document.querySelectorAll('.cat-box').forEach(c => c.style.display = 'none');
             el.style.display = open ? 'none' : 'block';
         }
 
+        function clearCart() {
+            playSfx(80, 'square', 0.2);
+            document.getElementById('app').classList.add('glitch-hit');
+            setTimeout(() => document.getElementById('app').classList.remove('glitch-hit'), 200);
+            document.querySelectorAll('.check').forEach(c => c.checked = false);
+            updateCount();
+        }
+
+        function updateCount() {
+            const n = document.querySelectorAll('.check:checked').length;
+            document.getElementById('count').innerText = n > 0 ? `[${n}]` : "";
+        }
+
         function pop(s, m, l, h, q, t, p) {
-            playSfx(400, 'sine', 0.1, 0.05);
+            playSfx(450, 'sine', 0.1);
             document.getElementById('m-strain').innerText = s;
-            document.getElementById('m-metrc').innerText = m || 'N/A';
-            document.getElementById('m-lot').innerText = l || 'N/A';
-            document.getElementById('m-harvest').innerText = h || 'N/A';
-            document.getElementById('m-qty').innerText = q || 'N/A';
-            document.getElementById('m-thc').innerText = t || 'N/A';
-            document.getElementById('m-price').innerText = p || 'N/A';
+            document.getElementById('m-metrc').innerText = m || '---';
+            document.getElementById('m-lot').innerText = l || '---';
+            document.getElementById('m-harvest').innerText = h || '---';
+            document.getElementById('m-qty').innerText = q || '---';
+            document.getElementById('m-thc').innerText = t || '--';
+            document.getElementById('m-price').innerText = p || 'TBD';
             document.getElementById('modal').style.display = 'flex';
+            document.getElementById('modal-box').classList.add('glitch-hit');
+            setTimeout(() => document.getElementById('modal-box').classList.remove('glitch-hit'), 200);
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
         }
 
         async function start() {
@@ -116,7 +197,7 @@
                     const cId = 'cat-' + i;
                     const hDiv = document.createElement('div');
                     hDiv.className = 'cat-header';
-                    hDiv.innerHTML = `<span>${sName}</span><span>+</span>`;
+                    hDiv.innerHTML = `<span>${sName}</span><span>[+]</span>`;
                     hDiv.onclick = () => toggle(cId);
                     list.appendChild(hDiv);
 
@@ -136,7 +217,7 @@
                         if (row[0] && !row[1] && !row[2]) {
                             const sub = document.createElement('div');
                             sub.className = 'sub-section-title';
-                            sub.innerText = row[0];
+                            sub.innerText = "LINKING >> " + row[0];
                             cDiv.appendChild(sub);
                             return;
                         }
@@ -146,14 +227,13 @@
                             item.className = 'row';
                             const d = { s:row[idx.s], m:row[idx.m], l:row[idx.l], h:row[idx.h], q:row[idx.q], t:row[idx.t], p:row[idx.p] };
                             item.innerHTML = `
-                                <input type="checkbox" class="check" 
+                                <input type="checkbox" class="check" onchange="updateCount()"
                                     data-full='{"Strain":"${d.s}","Lot":"${d.l||'NA'}","THC":"${d.t||'NA'}","Weight":"${d.q||'NA'}","Price":"${d.p||'NA'}"}'>
-                                <div class="info">
-                                    <div style="font-weight:bold; color:white; font-size:16px;">${d.s}</div>
-                                    <div style="font-size:11px; color:var(--gold); margin-top:4px;">THC: ${d.t||'--'}% | ${d.p||'INQUIRE'}</div>
+                                <div class="info" style="flex-grow:1; margin-left:15px; cursor:pointer;" onclick="pop('${d.s.replace(/'/g, "")}','${d.m}','${d.l}','${d.h}','${d.q}','${d.t}','${d.p}')">
+                                    <div style="font-weight:bold; color:white; font-size:16px; letter-spacing:1px;">${d.s}</div>
+                                    <div style="font-size:10px; color:var(--gold); margin-top:5px; font-family:monospace;">THC:${d.t||'--'}% | PRICE:${d.p||'---'}</div>
                                 </div>
                             `;
-                            item.querySelector('.info').onclick = () => pop(d.s, d.m, d.l, d.h, d.q, d.t, d.p);
                             cDiv.appendChild(item);
                         }
                     });
@@ -161,7 +241,7 @@
                 });
 
                 setTimeout(() => {
-                    playSfx(80, 'sine', 0.5, 0.2); // Subtle load-complete thud
+                    playSfx(60, 'sine', 0.5, 0.1); 
                     document.getElementById('loader').style.display = 'none';
                     document.getElementById('app').style.display = 'flex';
                 }, 3000);
@@ -172,16 +252,18 @@
         function send() {
             const checks = Array.from(document.querySelectorAll('.check:checked'));
             if(checks.length === 0) return;
+            playSfx(900, 'sine', 0.2);
             
-            let body = "REQUESTING WHOLESALE QUOTE FOR:%0A%0A";
+            let body = "--- SUMMA_WHOLESALE_OS_EXPORT ---%0A%0A";
             checks.forEach(c => {
                 const data = JSON.parse(c.getAttribute('data-full'));
-                body += `• ${data.Strain.toUpperCase()}%0A`;
-                body += `  Lot: ${data.Lot} | THC: ${data.THC}%25%0A`;
-                body += `  Weight: ${data.Weight} | Price: ${data.Price}%0A%0A`;
+                body += `[ITEM]: ${data.Strain.toUpperCase()}%0A`;
+                body += `[LOT]: ${data.Lot} | [THC]: ${data.THC}%25%0A`;
+                body += `[QTY]: ${data.Weight} | [PRC]: ${data.Price}%0A`;
+                body += `-------------------------------%0A`;
             });
 
-            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Inquiry (${checks.length} Items)&body=${body}`;
+            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Request - ${checks.length} Items&body=${body}`;
         }
 
         window.addEventListener('load', start);
