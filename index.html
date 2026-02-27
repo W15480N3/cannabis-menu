@@ -10,7 +10,7 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: #d1d1d1; font-family: 'Courier New', monospace; margin: 0; padding: 0; height: 100dvh; overflow: hidden; }
         
-        #loader { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--bg); z-index: 10000; color: var(--gold); }
+        #loader { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--bg); z-index: 10000; color: var(--gold); text-align: center; padding: 20px; }
         .spinner { width: 40px; height: 40px; border: 3px solid #333; border-top: 3px solid var(--gold); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
@@ -41,7 +41,7 @@
 
     <div id="loader">
         <div class="spinner"></div>
-        <div>CONNECTING TO SECURE DATA...</div>
+        <div id="status">CONNECTING...</div>
     </div>
 
     <div id="modal" onclick="this.style.display='none'">
@@ -65,7 +65,6 @@
     </div>
 
     <script>
-        // Use a safe toggle function
         function toggle(id) {
             const el = document.getElementById(id);
             if (!el) return;
@@ -87,19 +86,29 @@
         async function start() {
             try {
                 const response = await fetch('menu.xlsx');
-                if(!response.ok) throw "File 'menu.xlsx' not found.";
+                if(!response.ok) throw "FILE NOT FOUND (404)";
                 
                 const arrayBuffer = await response.arrayBuffer();
                 const workbook = XLSX.read(new Uint8Array(arrayBuffer), {type:'array'});
                 const list = document.getElementById('menu-list');
 
+                if (!workbook.SheetNames.length) throw "EXCEL FILE IS EMPTY";
+
                 workbook.SheetNames.forEach((sName, i) => {
                     const data = XLSX.utils.sheet_to_json(workbook.Sheets[sName], {header:1});
-                    if (data.length === 0) return;
+                    if (!data || data.length < 1) return;
 
-                    // Header scrubbing logic
-                    const headers = (data[0] || []).map(h => String(h || "").toLowerCase().replace(/[#*_\s]/g, ''));
-                    const getCol = (keys) => headers.findIndex(h => keys.some(k => h.includes(k)));
+                    // DEFENSIVE HEADER MAPPING
+                    const headerRow = data[0] || [];
+                    const headers = headerRow.map(h => {
+                        if (h === undefined || h === null) return "";
+                        return String(h).toLowerCase().replace(/[#*_\s]/g, '');
+                    });
+
+                    const getCol = (keys) => headers.findIndex(h => {
+                        if (!h) return false;
+                        return keys.some(k => h.includes(k));
+                    });
 
                     const idx = {
                         s: getCol(['strain']),
@@ -122,7 +131,8 @@
                     cDiv.className = 'cat-box';
 
                     data.slice(1).forEach(row => {
-                        if(!row || !row[idx.s]) return; // Skip empty rows
+                        if(!row || idx.s === -1 || !row[idx.s]) return;
+                        
                         const item = document.createElement('div');
                         item.className = 'row';
                         item.innerHTML = `
@@ -146,8 +156,8 @@
                 document.getElementById('app').style.display = 'flex';
 
             } catch(e) {
-                const l = document.getElementById('loader');
-                l.innerHTML = `<div style="padding:20px; text-align:center;">CRITICAL ERROR:<br>${e}<br><br>Confirm menu.xlsx is in the root folder.</div>`;
+                document.getElementById('status').innerHTML = `<span style="color:#ff4444">CRITICAL ERROR:</span><br>${e}`;
+                console.error("System Crash:", e);
             }
         }
 
@@ -157,7 +167,6 @@
             window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Request&body=Requesting Information For:%0A%0A- ${sel.join('%0A- ')}`;
         }
 
-        // Run after window loads to ensure library is ready
         window.addEventListener('load', start);
     </script>
 </body>
