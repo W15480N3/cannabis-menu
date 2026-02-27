@@ -17,7 +17,8 @@
             background: var(--summa-black); 
             color: #d1d1d1; 
             font-family: 'Courier New', monospace; 
-            margin: 0; padding: 0; overflow-x: hidden;
+            margin: 0; padding: 0; overflow: hidden;
+            height: 100vh;
         }
 
         /* GOLD SCANLINES WITH FLICKER */
@@ -53,20 +54,25 @@
 
         /* THE INTERFACE */
         #app { 
-            display: none; width: 95vw; max-width: 450px; margin: 20px auto; 
+            display: none; width: 95vw; max-width: 450px; margin: 10px auto; 
             background: var(--summa-grey); border: 1px solid #333; 
             border-radius: 12px; position: relative;
             box-shadow: 0 0 50px rgba(0,0,0,1), 0 0 20px var(--summa-gold-glow);
+            height: calc(100vh - 20px); /* Fill screen height */
+            display: flex;
+            flex-direction: column;
         }
 
         .logo-bar { 
-            background: var(--summa-black); padding: 25px; 
+            background: var(--summa-black); padding: 30px 20px; 
             text-align: center; border-bottom: 1px solid var(--summa-gold);
             display: flex; justify-content: center; align-items: center;
         }
 
         .logo-img {
-            max-width: 190px; height: auto;
+            max-width: 240px; /* Bigger logo */
+            width: 80%;
+            height: auto;
             filter: drop-shadow(0 0 10px var(--summa-gold-glow));
             animation: logoPulse 4s ease-in-out infinite;
         }
@@ -74,9 +80,11 @@
         @keyframes logoPulse { 0%, 100% { filter: drop-shadow(0 0 5px var(--summa-gold-glow)); } 50% { filter: drop-shadow(0 0 15px rgba(238, 180, 59, 0.4)); } }
 
         #menu-list { 
-            background: #000; margin: 10px; 
+            background: #000; 
+            flex-grow: 1; /* Automatically takes up all available space */
+            margin: 10px; 
             border: 1px solid #222; border-radius: 8px;
-            overflow-y: auto; height: 58vh;
+            overflow-y: auto;
             box-shadow: inset 0 0 25px var(--summa-gold-glow);
         }
         
@@ -105,7 +113,14 @@
         }
         .item-row input:checked { background: var(--summa-gold); }
 
-        .footer { padding: 15px 20px 20px 20px; background: var(--summa-grey); display: flex; flex-direction: column; gap: 10px; }
+        .footer { 
+            padding: 10px 20px 15px 20px; 
+            background: var(--summa-grey); 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px;
+            border-top: 1px solid #333;
+        }
         
         .order-btn { 
             width: 100%; padding: 18px; 
@@ -117,11 +132,11 @@
         }
 
         .clear-btn {
-            background: transparent; color: #666; border: 1px solid #333;
-            padding: 10px; font-size: 10px; cursor: pointer; border-radius: 4px;
+            background: transparent; color: #666; border: none;
+            padding: 5px; font-size: 10px; cursor: pointer;
             text-transform: uppercase; letter-spacing: 1px; transition: 0.3s;
         }
-        .clear-btn:hover { color: var(--summa-gold); border-color: var(--summa-gold); background: rgba(238, 180, 59, 0.05); }
+        .clear-btn:hover { color: var(--summa-gold); }
     </style>
 </head>
 <body>
@@ -143,7 +158,7 @@
         <div id="menu-list"></div>
         <div class="footer">
             <button class="order-btn" onclick="playBeep(440, 0.1); sendEmail()">REQUEST QUOTE</button>
-            <button class="clear-btn" onclick="clearSelections()">Clear All Selections</button>
+            <button class="clear-btn" onclick="clearSelections()">Clear Selections</button>
         </div>
     </div>
 
@@ -172,14 +187,9 @@
         }
 
         function clearSelections() {
-            // First play a neutral prompt tone
             playBeep(300, 0.1);
-            
-            // Native browser confirmation
-            const confirmed = confirm("Are you sure you want to clear all selected items?");
-            
-            if (confirmed) {
-                playBeep(150, 0.3); // Lower "action" tone
+            if (confirm("Clear all selected items?")) {
+                playBeep(150, 0.3);
                 document.querySelectorAll('.order-check').forEach(cb => cb.checked = false);
             }
         }
@@ -191,7 +201,7 @@
                 loader.style.opacity = '0';
                 setTimeout(() => {
                     loader.style.display = 'none';
-                    document.getElementById('app').style.display = 'block';
+                    document.getElementById('app').style.display = 'flex'; // Changed to flex for alignment
                     playBeep(880, 0.05);
                 }, 800);
             }, 2500);
