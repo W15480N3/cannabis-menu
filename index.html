@@ -3,106 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SUMMA MENU v3</title>
+    <title>SUMMA TERMINAL v4.0</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        /* BASE THEME - FORCED BLACK */
-        html, body { background-color: #000 !important; color: #0f0 !important; font-family: 'Courier New', monospace; margin: 0; padding: 0; height: 100%; width: 100%; }
-        
+        /* BASE THEME - TERMINAL BLACK */
+        html, body { 
+            background-color: #050505 !important; 
+            color: #0f0 !important; 
+            font-family: 'Courier New', monospace; 
+            margin: 0; padding: 0; 
+            overflow-x: hidden;
+        }
+
+        /* MOVING BACKGROUND EFFECT (Matrix Scanlines) */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 255, 0, 0.05) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            z-index: 9999;
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        .scanline-light {
+            width: 100%; height: 100px;
+            background: linear-gradient(0deg, transparent, rgba(0, 255, 0, 0.1), transparent);
+            position: fixed; top: 0; left: 0;
+            animation: scanline 8s linear infinite;
+            z-index: 9998; pointer-events: none;
+        }
+
         /* LOADING SCREEN */
         #loader { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             display: flex; flex-direction: column; justify-content: center; 
-            align-items: center; background: #000; z-index: 9999; 
+            align-items: center; background: #000; z-index: 10000; 
         }
-        .bar-container { width: 200px; height: 12px; border: 2px solid #0f0; margin-top: 15px; padding: 2px; }
+        .bar-container { width: 200px; height: 12px; border: 2px solid #0f0; margin-top: 15px; padding: 2px; box-shadow: 0 0 10px #0f0; }
         #fill { height: 100%; background: #0f0; width: 0%; animation: load 3s forwards; }
         @keyframes load { to { width: 100%; } }
 
         /* WINAMP WINDOW */
-        #app { display: none; width: 95vw; max-width: 500px; margin: 10px auto; background: #c0c0c0; border: 3px outset #fff; color: #000; box-shadow: 5px 5px 0px #000; }
+        #app { display: none; width: 95vw; max-width: 500px; margin: 10px auto; background: #c0c0c0; border: 3px outset #fff; color: #000; box-shadow: 10px 10px 0px rgba(0,0,0,0.5); }
         .title-bar { background: linear-gradient(90deg, #000080, #0878c0); color: white; padding: 6px; font-weight: bold; font-size: 13px; display: flex; justify-content: space-between; }
         
-        /* ADMIN AREA - HIDDEN */
-        #admin-zone { display: none !important; background: #ff4444; padding: 10px; border-bottom: 2px solid #000; text-align: center; }
+        /* ADMIN AREA */
+        #admin-zone { display: none !important; background: #ff4444; padding: 10px; border-bottom: 2px solid #000; text-align: center; font-weight: bold; }
 
-        #menu-list { background: #000; margin: 4px; border: 2px inset #fff; overflow-y: auto; max-height: 60vh; min-height: 200px; }
+        #menu-list { background: #000; margin: 4px; border: 2px inset #fff; overflow-y: auto; max-height: 60vh; min-height: 250px; }
         
-        /* COLLAPSIBLE BUTTONS */
+        /* COLLAPSIBLE ACCORDIONS */
         .category-btn { 
-            width: 100%; padding: 16px; background: #888; color: #fff; 
+            width: 100%; padding: 18px; background: #888; color: #fff; 
             text-align: left; border: 2px outset #eee; font-weight: bold; 
-            cursor: pointer; font-size: 16px; display: block;
+            cursor: pointer; font-size: 16px; display: flex; justify-content: space-between;
         }
-        .category-content { display: none; background: #111; border-left: 4px solid #0f0; }
+        .category-content { display: none; background: #050505; border-left: 4px solid #0f0; }
         
-        .section-header { background: #222; color: #0f0; padding: 10px; font-size: 13px; border-bottom: 1px solid #333; font-weight: bold; }
-        .item-row { display: flex; align-items: center; padding: 12px 10px; border-bottom: 1px solid #333; color: #fff; }
-        .item-row input { width: 24px; height: 24px; margin-right: 15px; }
+        .section-header { background: #1a1a1a; color: #0f0; padding: 12px; font-size: 13px; border-bottom: 1px solid #0f0; font-weight: bold; letter-spacing: 1px; }
+        .item-row { display: flex; align-items: center; padding: 15px 10px; border-bottom: 1px solid #222; color: #fff; }
+        .item-row:hover { background: #0a0a0a; }
+        .item-row input { width: 24px; height: 24px; margin-right: 15px; accent-color: #0f0; }
         
         .footer { padding: 12px; background: #c0c0c0; border-top: 2px solid #888; }
-        .order-btn { width: 100%; padding: 18px; background: #0f0; font-weight: bold; border: 3px outset #fff; cursor: pointer; font-size: 16px; }
+        .order-btn { width: 100%; padding: 20px; background: #0f0; font-weight: bold; border: 3px outset #fff; cursor: pointer; font-size: 18px; text-transform: uppercase; }
+        .order-btn:hover { background: #00ff00; box-shadow: 0 0 15px #0f0; }
     </style>
 </head>
 <body>
 
+    <div class="scanline-light"></div>
+
     <div id="loader">
-        <div style="letter-spacing: 4px; font-weight: bold; color: #0f0;">INITIALIZING CANNABIS...</div>
+        <div style="letter-spacing: 5px; font-weight: bold; color: #0f0; text-shadow: 0 0 8px #0f0;">BOOTING...</div>
         <div class="bar-container"><div id="fill"></div></div>
+        <p style="font-size: 10px; margin-top: 10px;">SUMMA_OS v4.0.1</p>
     </div>
 
     <div id="app">
         <div id="admin-zone">
             <input type="file" id="excel-upload" accept=".xlsx" style="display:none;">
-            <button onclick="document.getElementById('excel-upload').click()">🛠 ADMIN: UPLOAD NEW MENU</button>
+            <button onclick="document.getElementById('excel-upload').click()" style="padding:10px; font-weight:bold; cursor:pointer;">[ UPLOAD NEW MENU.XLSX ]</button>
         </div>
 
         <div class="title-bar">
-            <span>SUMMA_SYSTEM_v3.exe</span>
+            <span>SUMMA_TERMINAL.exe</span>
             <span>_ □ X</span>
         </div>
 
         <div id="menu-list">
-            <p style="color:#fff; padding:20px; text-align:center;">Checking for menu.xlsx...</p>
+            <p style="color:#0f0; padding:20px; text-align:center; font-size: 12px;">SEARCHING FOR DATABASE...</p>
         </div>
 
         <div class="footer">
-            <button class="order-btn" onclick="sendEmail()">SEND ORDER EMAIL</button>
+            <button class="order-btn" onclick="sendEmail()">Submit Order</button>
         </div>
     </div>
 
     <script>
-        // FORCED TOGGLE FUNCTION
         function toggleCategory(id) {
             const content = document.getElementById(id);
-            if (content.style.display === "block") {
-                content.style.display = "none";
-            } else {
+            const allFolders = document.querySelectorAll('.category-content');
+            
+            // This logic allows only one folder open at a time for a cleaner look
+            const isClosing = content.style.display === "block";
+            allFolders.forEach(f => f.style.display = "none");
+            
+            if (!isClosing) {
                 content.style.display = "block";
             }
         }
 
-        // EMERGENCY OVERRIDE: If the site freezes, show the app anyway after 4 seconds
+        // Emergency Override (4s)
         setTimeout(() => {
             const loader = document.getElementById('loader');
             if (loader.style.display !== 'none') {
-                console.log("Emergency Override triggered.");
                 loader.style.display = 'none';
                 document.getElementById('app').style.display = 'block';
             }
         }, 4000);
 
         window.onload = function() {
-            // 1. Show Admin button if ?admin=true
             const params = new URLSearchParams(window.location.search);
             if (params.get('admin') === 'true') {
                 document.getElementById('admin-zone').style.setProperty("display", "block", "important");
             }
 
-            // 2. Try to load the file
             loadMenu();
 
-            // 3. Admin Upload Listener
             document.getElementById('excel-upload').addEventListener('change', function(e) {
                 const reader = new FileReader();
                 reader.onload = (event) => processData(event.target.result);
@@ -113,11 +148,11 @@
         async function loadMenu() {
             try {
                 const resp = await fetch('menu.xlsx');
-                if (!resp.ok) throw new Error("No file");
+                if (!resp.ok) throw new Error();
                 const buf = await resp.arrayBuffer();
                 processData(buf);
             } catch (e) {
-                document.getElementById('menu-list').innerHTML = "<p style='color:white; padding:20px; text-align:center;'>[SYSTEM READY]<br>Please use admin link to upload menu.xlsx</p>";
+                document.getElementById('menu-list').innerHTML = "<p style='color:#0f0; padding:30px; text-align:center;'>LOADER READY.<br><br>Please upload <b>menu.xlsx</b> via admin link.</p>";
             }
         }
 
@@ -130,14 +165,12 @@
                 wb.SheetNames.forEach((name, idx) => {
                     const rows = XLSX.utils.sheet_to_json(wb.Sheets[name], {header: 1});
                     
-                    // Create Category Button
                     const b = document.createElement('button');
                     b.className = "category-btn";
-                    b.innerHTML = `📁 ${name.toUpperCase()} <span style="float:right;">+</span>`;
+                    b.innerHTML = `<span>📂 ${name.toUpperCase()}</span> <span>▼</span>`;
                     b.onclick = function() { toggleCategory('cat-' + idx); };
                     list.appendChild(b);
 
-                    // Create Content Box
                     const cont = document.createElement('div');
                     cont.id = 'cat-' + idx;
                     cont.className = "category-content";
@@ -152,22 +185,20 @@
                             return;
                         }
 
-                        // Subheaders
                         if (r[0] && !r[tCol] && !r[pCol] && r[0] !== "Strain") {
                             const h = document.createElement('div');
                             h.className = "section-header";
-                            h.innerText = "> " + r[0];
+                            h.innerText = ">> " + r[0];
                             cont.appendChild(h);
                         }
 
-                        // Products
                         if (sCol > -1 && r[sCol] && r[sCol] !== "Strain") {
                             const rowDiv = document.createElement('div');
                             rowDiv.className = 'item-row';
                             rowDiv.innerHTML = `
                                 <input type="checkbox" class="order-check" value="${r[sCol]} (${name})">
                                 <div>
-                                    <div style="font-weight:bold;">${r[sCol]}</div>
+                                    <div style="font-weight:bold; font-size:16px;">${r[sCol]}</div>
                                     <div style="color:#0f0; font-size:11px;">THC: ${r[tCol] || '?'}% | $${r[pCol] || 'TBD'}</div>
                                 </div>
                             `;
@@ -183,10 +214,10 @@
 
         function sendEmail() {
             const checks = document.querySelectorAll('.order-check:checked');
-            if (checks.length === 0) { alert("Select items first!"); return; }
+            if (checks.length === 0) { alert("Please select items first!"); return; }
             let items = "";
             checks.forEach(c => { items += "- " + c.value + "%0A"; });
-            window.location.href = `mailto:sales@summacannabis.com?subject=Wholesale Order&body=I want to order:%0A%0A${items}`;
+            window.location.href = `mailto:sales@summacannabis.com?subject=Wholesale Order&body=Yo! I want to order:%0A%0A${items}`;
         }
     </script>
 </body>
