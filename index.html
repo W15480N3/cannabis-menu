@@ -19,26 +19,29 @@
         .logo-img { max-width: 180px; width: 50%; height: auto; }
         
         #menu-list { background: #000; flex-grow: 1; overflow-y: auto; margin: 0 5px; border: 1px solid #222; -webkit-overflow-scrolling: touch; }
-        .category-btn { width: 100%; padding: 18px; background: var(--summa-grey); color: var(--summa-gold); text-align: left; border: none; border-bottom: 1px solid #222; font-weight: bold; font-family: inherit; }
         
+        /* CATEGORY STYLING */
+        .category-header { background: #222; color: var(--summa-gold); padding: 10px 15px; font-weight: bold; font-size: 14px; text-transform: uppercase; border-bottom: 1px solid #444; margin-top: 5px; cursor: pointer; display: flex; justify-content: space-between; }
+        .category-content { display: none; } /* Collapsed by default */
+
         .item-row { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #111; }
         .item-info { flex-grow: 1; margin-left: 10px; cursor: pointer; }
         .order-check { appearance: none; width: 24px; height: 24px; border: 1px solid var(--summa-gold); border-radius: 3px; flex-shrink: 0; cursor: pointer; }
         .order-check:checked { background: var(--summa-gold); }
 
         #detail-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; justify-content: center; align-items: center; padding: 20px; }
-        .detail-box { background: var(--summa-grey); border: 1px solid var(--summa-gold); width: 90%; max-width: 320px; padding: 20px; border-radius: 4px; box-shadow: 0 0 20px rgba(238, 180, 59, 0.2); }
+        .detail-box { background: var(--summa-grey); border: 1px solid var(--summa-gold); width: 90%; max-width: 320px; padding: 20px; border-radius: 4px; }
         .detail-label { color: var(--summa-gold); font-size: 10px; text-transform: uppercase; margin-top: 10px; }
-        .detail-val { color: #fff; font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 2px; margin-bottom: 4px; overflow-wrap: break-word; }
+        .detail-val { color: #fff; font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 2px; margin-bottom: 4px; word-break: break-all; }
 
         .footer { padding: 15px; background: var(--summa-black); border-top: 1px solid var(--summa-gold); flex-shrink: 0; }
-        .order-btn { width: 100%; padding: 16px; background: var(--summa-gold); color: #000; border: none; border-radius: 4px; font-weight: 900; font-family: inherit; cursor: pointer; }
+        .order-btn { width: 100%; padding: 16px; background: var(--summa-gold); color: #000; border: none; border-radius: 4px; font-weight: 900; font-family: inherit; }
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <div style="color: var(--summa-gold); font-size: 12px; letter-spacing: 2px;">REPAIRING LINK...</div>
+        <div style="color: var(--summa-gold); font-size: 12px; letter-spacing: 2px;">RE-INITIALIZING...</div>
     </div>
 
     <div id="detail-overlay" onclick="closeDetail()">
@@ -49,7 +52,7 @@
             <div class="detail-label">HARVEST DATE</div><div id="det-harvest" class="detail-val">--</div>
             <div class="detail-label">QUANTITY</div><div id="det-qty" class="detail-val">--</div>
             <div class="detail-label">THC %</div><div id="det-thc" class="detail-val">--</div>
-            <button onclick="closeDetail()" style="width:100%; margin-top:20px; padding:12px; background:#333; color:#fff; border:none; font-family:inherit; cursor:pointer;">BACK</button>
+            <button onclick="closeDetail()" style="width:100%; margin-top:20px; padding:12px; background:#333; color:#fff; border:none; font-family:inherit;">CLOSE</button>
         </div>
     </div>
 
@@ -60,7 +63,7 @@
         </div>
         <div id="menu-list"></div>
         <div class="footer">
-            <button class="order-btn" onclick="sendEmail()">SEND REQUEST <span id="count-badge"></span></button>
+            <button class="order-btn" onclick="sendEmail()">CHECK AVAILABILITY <span id="count-badge"></span></button>
         </div>
     </div>
 
@@ -70,6 +73,15 @@
             document.querySelectorAll('.item-row').forEach(row => {
                 row.style.display = row.innerText.toLowerCase().includes(input) ? "flex" : "none";
             });
+            // Auto-expand sections when searching
+            document.querySelectorAll('.category-content').forEach(c => {
+                if(input.length > 0) c.style.display = 'block';
+            });
+        }
+
+        function toggleCat(id) {
+            const c = document.getElementById(id);
+            c.style.display = (c.style.display === 'block') ? 'none' : 'block';
         }
 
         function showDetail(strain, metrc, lot, harvest, qty, thc) {
@@ -97,17 +109,23 @@
                     const rows = XLSX.utils.sheet_to_json(wb.Sheets[name], {header: 1});
                     if (rows.length < 2) return;
 
-                    const catTitle = document.createElement('div');
-                    catTitle.className = "category-btn";
-                    catTitle.innerText = name.toUpperCase();
-                    list.appendChild(catTitle);
+                    const catId = 'cat-' + idx;
+                    const catHeader = document.createElement('div');
+                    catHeader.className = "category-header";
+                    catHeader.innerHTML = `<span>${name.toUpperCase()}</span><span>+</span>`;
+                    catHeader.onclick = () => toggleCat(catId);
+                    list.appendChild(catHeader);
+
+                    const cont = document.createElement('div');
+                    cont.id = catId;
+                    cont.className = 'category-content';
 
                     const hRow = rows[0];
-                    // SAFE COLUMN FINDER: Checks if the header exists and is a string before calling .includes()
+                    // SUPER-SAFE FINDER: Removes #, *, spaces and compares lowercase
                     const f = (keys) => hRow.findIndex(col => {
                         if (!col) return false;
-                        const sCol = String(col).toLowerCase();
-                        return keys.some(k => sCol.includes(k.toLowerCase()));
+                        const cleanCol = String(col).replace(/[#*_\s]/g, '').toLowerCase();
+                        return keys.some(k => cleanCol.includes(k.toLowerCase()));
                     });
 
                     const sI = f(['strain']);
@@ -125,21 +143,21 @@
                             <input type="checkbox" class="order-check" data-strain="${r[sI]}">
                             <div class="item-info" onclick="showDetail('${r[sI]}','${r[mI]||''}','${r[lI]||''}','${r[hI]||''}','${r[qI]||''}','${r[tI]||''}')">
                                 <div style="font-weight:bold; color:#fff;">${r[sI]}</div>
-                                <div style="font-size:10px; color:var(--summa-gold);">THC: ${r[tI]||'N/A'}% | TAP FOR DATA</div>
+                                <div style="font-size:10px; color:var(--summa-gold);">THC: ${r[tI]||'N/A'}% | DATA ></div>
                             </div>
                         `;
                         row.querySelector('.order-check').onchange = () => {
                             const count = document.querySelectorAll('.order-check:checked').length;
                             document.getElementById('count-badge').innerText = count > 0 ? `(${count})` : "";
                         };
-                        list.appendChild(row);
+                        cont.appendChild(row);
                     });
+                    list.appendChild(cont);
                 });
                 document.getElementById('loader').style.display='none'; 
                 document.getElementById('app').style.display='flex';
             } catch (err) { 
-                document.getElementById('loader').innerText = "DATA ACCESS ERROR. CHECK FILENAME.";
-                console.error(err);
+                document.getElementById('loader').innerText = "LOAD ERROR: CHECK FILENAME.";
             }
         }
 
