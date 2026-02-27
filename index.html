@@ -41,16 +41,15 @@
         .loading-text { font-size: 11px; letter-spacing: 5px; text-transform: uppercase; font-weight: bold; color: var(--gold); }
         .ticker { font-size: 9px; color: #555; margin-top: 15px; height: 15px; }
 
-        #app { display: none; width: 100%; height: 100dvh; max-width: 450px; margin: 0 auto; background: rgba(5, 5, 5, 0.96); flex-direction: column; position: relative; }
+        #app { display: none; width: 100%; height: 100dvh; max-width: 450px; margin: 0 auto; background: rgba(5, 5, 5, 0.96); flex-direction: column; position: relative; border-left: 1px solid #222; border-right: 1px solid #222;}
         
-        /* LOGO BAR WITH TAGS */
         .logo-bar { background: #000; padding: 35px 15px; text-align: center; border-bottom: 2px solid var(--gold); position: relative; }
-        .creator-tag { position: absolute; top: 8px; left: 12px; font-size: 9px; color: #555; letter-spacing: 1px; }
+        .creator-tag { position: absolute; top: 8px; left: 12px; font-size: 9px; color: #444; letter-spacing: 1px; }
         .status-tag { position: absolute; top: 8px; right: 12px; font-size: 9px; color: #0f0; letter-spacing: 1px; animation: blink 2s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         .logo-img { max-width: 190px; width: 65%; filter: drop-shadow(0 0 8px rgba(238, 180, 59, 0.3)); }
         
-        #menu-list { flex-grow: 1; overflow-y: auto; padding-bottom: 80px; scroll-behavior: smooth; }
+        #menu-list { flex-grow: 1; overflow-y: auto; padding-bottom: 80px; scroll-behavior: smooth; background: #000;}
         
         .cat-header { 
             background: #0d0d0d; color: var(--gold); padding: 22px; font-weight: 900; 
@@ -58,7 +57,7 @@
             font-size: 15px; text-transform: uppercase; letter-spacing: 2px;
         }
         
-        .sub-section-title { background: #151515; color: #666; padding: 12px 18px; font-size: 10px; border-bottom: 1px solid #222; letter-spacing: 4px; font-weight: bold; }
+        .sub-section-title { background: #151515; color: #555; padding: 12px 18px; font-size: 10px; border-bottom: 1px solid #222; letter-spacing: 4px; font-weight: bold; }
 
         .row { display: flex; align-items: center; padding: 22px 15px; border-bottom: 1px solid #111; position: relative; }
         .row:active { background: #1a1a1a; }
@@ -68,7 +67,7 @@
             transition: 0.2s; position: relative; background: #000;
         }
         .check:checked { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 15px var(--gold); }
-        .check:checked::after { content: "LOCKED"; position: absolute; bottom: -12px; left: -5px; font-size: 7px; color: var(--gold); font-weight: bold; }
+        .check:checked::after { content: "OK"; position: absolute; bottom: -12px; left: 3px; font-size: 7px; color: var(--gold); font-weight: bold; }
 
         #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 11000; justify-content: center; align-items: center; padding: 20px; }
         .modal-box { background: #0a0a0a; border: 1px solid var(--gold); width: 100%; max-width: 360px; padding: 30px; box-shadow: 0 0 50px rgba(0,0,0,1); }
@@ -80,7 +79,6 @@
         .btn { flex: 3; padding: 20px; background: var(--gold); color: #000; border: none; font-weight: 900; cursor: pointer; letter-spacing: 3px; font-family: inherit; }
         .btn-clear { flex: 1; background: #1a1a1a; color: #555; border: 1px solid #333; font-size: 9px; font-weight: bold; }
 
-        /* GLITCH SHAKE ANIMATION */
         .glitch-hit { animation: shake 0.2s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
     </style>
@@ -132,17 +130,9 @@
             o.start(); o.stop(ctx.currentTime + d);
         }
 
-        const tickerLines = [
-            "SCANNING_METRC_FILES...", "DECRYPTING_LAB_RESULTS...", "PARSING_STRAIN_GENETICS...", 
-            "MAPPING_LOT_QUANTITIES...", "ESTABLISHING_SECURE_NODE...", "READY."
-        ];
+        const tickerLines = ["SCANNING_METRC...", "DECRYPTING_LABS...", "MAPPING_INVENTORY...", "READY."];
         let tIdx = 0;
-        setInterval(() => {
-            if(tIdx < tickerLines.length) {
-                document.getElementById('ticker').innerText = tickerLines[tIdx];
-                tIdx++;
-            }
-        }, 500);
+        setInterval(() => { if(tIdx < tickerLines.length) { document.getElementById('ticker').innerText = tickerLines[tIdx]; tIdx++; } }, 600);
 
         function toggle(id) {
             playSfx(180, 'sine', 0.1);
@@ -179,9 +169,7 @@
             setTimeout(() => document.getElementById('modal-box').classList.remove('glitch-hit'), 200);
         }
         
-        function closeModal() {
-            document.getElementById('modal').style.display = 'none';
-        }
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
         async function start() {
             try {
@@ -203,9 +191,9 @@
 
                     const cDiv = document.createElement('div');
                     cDiv.id = cId; cDiv.className = 'cat-box';
+                    cDiv.style.display = 'none'; // START CLOSED
 
                     let idx = { s:-1, t:-1, h:-1, q:-1, l:-1, m:-1, p:-1 };
-
                     data.forEach((row) => {
                         const cell0 = String(row[0] || "").toLowerCase();
                         if(cell0.includes('strain')) {
@@ -213,15 +201,13 @@
                             idx = { s:h.indexOf('strain'), t:h.findIndex(x=>x.includes('thc')), h:h.findIndex(x=>x.includes('harvest')), q:h.findIndex(x=>x.includes('weight')), l:h.indexOf('lot'), m:h.findIndex(x=>x.includes('metrc')), p:h.indexOf('price') };
                             return;
                         }
-
                         if (row[0] && !row[1] && !row[2]) {
                             const sub = document.createElement('div');
                             sub.className = 'sub-section-title';
-                            sub.innerText = "LINKING >> " + row[0];
+                            sub.innerText = "NODE >> " + row[0];
                             cDiv.appendChild(sub);
                             return;
                         }
-
                         if(row[idx.s] && idx.s !== -1 && row[idx.s].toLowerCase() !== 'strain') {
                             const item = document.createElement('div');
                             item.className = 'row';
@@ -231,7 +217,7 @@
                                     data-full='{"Strain":"${d.s}","Lot":"${d.l||'NA'}","THC":"${d.t||'NA'}","Weight":"${d.q||'NA'}","Price":"${d.p||'NA'}"}'>
                                 <div class="info" style="flex-grow:1; margin-left:15px; cursor:pointer;" onclick="pop('${d.s.replace(/'/g, "")}','${d.m}','${d.l}','${d.h}','${d.q}','${d.t}','${d.p}')">
                                     <div style="font-weight:bold; color:white; font-size:16px; letter-spacing:1px;">${d.s}</div>
-                                    <div style="font-size:10px; color:var(--gold); margin-top:5px; font-family:monospace;">THC:${d.t||'--'}% | PRICE:${d.p||'---'}</div>
+                                    <div style="font-size:10px; color:var(--gold); margin-top:5px; font-family:monospace;">THC:${d.t||'--'}% | PRC:${d.p||'---'}</div>
                                 </div>
                             `;
                             cDiv.appendChild(item);
@@ -253,17 +239,12 @@
             const checks = Array.from(document.querySelectorAll('.check:checked'));
             if(checks.length === 0) return;
             playSfx(900, 'sine', 0.2);
-            
             let body = "--- SUMMA_WHOLESALE_OS_EXPORT ---%0A%0A";
             checks.forEach(c => {
                 const data = JSON.parse(c.getAttribute('data-full'));
-                body += `[ITEM]: ${data.Strain.toUpperCase()}%0A`;
-                body += `[LOT]: ${data.Lot} | [THC]: ${data.THC}%25%0A`;
-                body += `[QTY]: ${data.Weight} | [PRC]: ${data.Price}%0A`;
-                body += `-------------------------------%0A`;
+                body += `[ITEM]: ${data.Strain.toUpperCase()}%0A[LOT]: ${data.Lot} | [THC]: ${data.THC}%25%0A[QTY]: ${data.Weight} | [PRC]: ${data.Price}%0A-------------------------------%0A`;
             });
-
-            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Request - ${checks.length} Items&body=${body}`;
+            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Inquiry - ${checks.length} Items&body=${body}`;
         }
 
         window.addEventListener('load', start);
