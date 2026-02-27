@@ -14,10 +14,10 @@
             margin: 0; padding: 0; overflow-x: hidden;
         }
 
-        /* SCANLINE & GRAIN EFFECT */
+        /* SCANLINE EFFECT */
         body::after {
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 2px);
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 2px);
             pointer-events: none; z-index: 1000;
         }
 
@@ -28,9 +28,9 @@
             align-items: center; background: #000; z-index: 10000; 
         }
         .alien-circle {
-            width: 150px; height: 150px; border: 4px solid #0f0; border-radius: 50%;
+            width: 100px; height: 100px; border: 3px solid #0f0; border-radius: 50%;
             border-top-color: #f0f; animation: spin 1s linear infinite;
-            box-shadow: 0 0 20px #0f0, inset 0 0 20px #f0f;
+            box-shadow: 0 0 15px #0f0;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -46,66 +46,179 @@
             background: #000; color: #0f0; padding: 12px; 
             text-align: center; font-size: 11px; font-weight: bold;
             border-bottom: 2px solid #333; letter-spacing: 2px;
-            text-shadow: 0 0 5px #0f0;
         }
 
-        #admin-zone { display: none !important; background: #200; padding: 10px; border-bottom: 2px solid #500; text-align: center; }
-
-        /* THE DISPLAY "POD" */
         #menu-list { 
             background: #050505; margin: 10px; 
             border: 2px solid #0f0; border-radius: 15px;
-            overflow-y: auto; max-height: 55vh; min-height: 300px;
+            overflow-y: auto; height: 60vh;
             box-shadow: inset 0 0 15px #0f0;
         }
         
-        /* CATEGORY BUTTONS */
         .category-btn { 
             width: 100%; padding: 18px; 
-            background: linear-gradient(180deg, #333, #111);
+            background: linear-gradient(180deg, #222, #000);
             color: #0f0; text-align: left; border: none;
             border-bottom: 1px solid #0f0; font-weight: bold; 
-            cursor: pointer; font-size: 16px; display: flex; 
-            justify-content: space-between; align-items: center;
+            cursor: pointer; display: flex; justify-content: space-between;
         }
-        .category-btn:hover { background: #222; text-shadow: 0 0 10px #0f0; }
 
-        .category-content { display: none; background: rgba(0,255,0,0.05); }
+        .category-content { display: none; background: rgba(0,255,0,0.03); }
         
         .section-header { 
             background: rgba(255,0,255,0.1); color: #f0f; 
-            padding: 10px; font-size: 11px; font-weight: bold; 
-            border-bottom: 1px solid #f0f; text-shadow: 0 0 5px #f0f;
-            letter-spacing: 1px;
+            padding: 8px 12px; font-size: 10px; border-bottom: 1px solid #f0f;
         }
 
-        .item-row { 
-            display: flex; align-items: center; padding: 15px 10px; 
-            border-bottom: 1px solid #1a1a1a; 
-        }
-
+        .item-row { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #111; }
+        
         .item-row input[type="checkbox"] { 
-            appearance: none; width: 22px; height: 22px; 
-            border: 2px solid #0f0; border-radius: 4px; margin-right: 15px; 
-            cursor: pointer; position: relative;
+            appearance: none; width: 20px; height: 20px; 
+            border: 2px solid #0f0; border-radius: 4px; margin-right: 12px; 
         }
-        .item-row input:checked { background: #0f0; box-shadow: 0 0 10px #0f0; }
-        .item-row input:checked::after { content: "✓"; color: black; font-weight: bold; position: absolute; left: 4px; top: -2px; }
+        .item-row input:checked { background: #0f0; }
 
-        /* FOOTER & BUTTONS */
         .footer { padding: 15px; background: #1a1a1a; }
         .order-btn { 
-            width: 100%; padding: 22px; 
+            width: 100%; padding: 20px; 
             background: #000; color: #0f0; 
             border: 2px solid #0f0; border-radius: 50px; 
-            font-weight: bold; cursor: pointer; text-transform: uppercase;
-            box-shadow: 0 0 10px rgba(0,255,0,0.3); letter-spacing: 1px;
+            font-weight: bold; cursor: pointer;
         }
-        .order-btn:hover { box-shadow: 0 0 20px #0f0; background: #0f0; color: #000; }
     </style>
 </head>
 <body>
 
     <div id="loader">
         <div class="alien-circle"></div>
-        <div style="margin-top:20px; letter-spacing: 5px; color: #
+        <div style="margin-top:20px; color: #0f0; font-size: 12px;">DECRYPTING DATABASE...</div>
+    </div>
+
+    <div id="app">
+        <div class="title-bar">SUMMA TERMINAL v2.0</div>
+        <div id="menu-list"></div>
+        <div class="footer">
+            <button class="order-btn" onclick="playBeep(600, 0.1); sendEmail()">REQUEST INFO</button>
+        </div>
+    </div>
+
+    <script>
+        // --- SYNTH SOUND ENGINE ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playBeep(freq, duration) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'square'; // "Retro" sound
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        // --- CORE LOGIC ---
+        function toggleCategory(id) {
+            playBeep(400, 0.15); // "Thud" sound for doors
+            const content = document.getElementById(id);
+            const isOpen = content.style.display === "block";
+            document.querySelectorAll('.category-content').forEach(c => c.style.display = "none");
+            if (!isOpen) content.style.display = "block";
+        }
+
+        window.onload = () => {
+            loadMenu();
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+            }, 2000);
+        };
+
+        async function loadMenu() {
+            try {
+                const resp = await fetch('menu.xlsx');
+                const buf = await resp.arrayBuffer();
+                const wb = XLSX.read(new Uint8Array(buf), {type: 'array'});
+                const list = document.getElementById('menu-list');
+
+                wb.SheetNames.forEach((name, idx) => {
+                    const rows = XLSX.utils.sheet_to_json(wb.Sheets[name], {header: 1});
+                    
+                    const b = document.createElement('button');
+                    b.className = "category-btn";
+                    b.innerHTML = `<span>${name.toUpperCase()}</span> <span>+</span>`;
+                    b.onclick = () => toggleCategory('cat-' + idx);
+                    list.appendChild(b);
+
+                    const cont = document.createElement('div');
+                    cont.id = 'cat-' + idx;
+                    cont.className = "category-content";
+
+                    let sCol = -1, tCol = -1, pCol = -1;
+                    let currentItems = [];
+                    let currentSection = "General";
+
+                    const flush = (title) => {
+                        if (currentItems.length > 0) {
+                            const h = document.createElement('div');
+                            h.className = "section-header";
+                            h.innerText = title;
+                            cont.appendChild(h);
+
+                            // Sort Highest THC first
+                            currentItems.sort((a, b) => {
+                                let vA = parseFloat(a.thc.toString().replace(/[^0-9.]/g, '')) || 0;
+                                let vB = parseFloat(b.thc.toString().replace(/[^0-9.]/g, '')) || 0;
+                                return vB - vA;
+                            });
+
+                            currentItems.forEach(item => {
+                                const r = document.createElement('div');
+                                r.className = 'item-row';
+                                r.onclick = () => playBeep(800, 0.05); // "Click" sound
+                                r.innerHTML = `
+                                    <input type="checkbox" class="order-check" value="${item.name}">
+                                    <div>
+                                        <div style="font-weight:bold; color:#fff;">${item.name}</div>
+                                        <div style="color:#0f0; font-size:11px;">THC: ${item.thc}% | $${item.price}</div>
+                                    </div>
+                                `;
+                                cont.appendChild(r);
+                            });
+                            currentItems = [];
+                        }
+                    };
+
+                    rows.forEach(r => {
+                        if (r.includes("Strain")) {
+                            sCol = r.indexOf("Strain");
+                            tCol = r.findIndex(c => c && c.toString().includes("THC"));
+                            pCol = r.findIndex(c => c && c.toString().includes("Price"));
+                            return;
+                        }
+                        if (r[0] && !r[tCol]) {
+                            flush(currentSection);
+                            currentSection = r[0];
+                        } else if (sCol > -1 && r[sCol]) {
+                            currentItems.push({name: r[sCol], thc: r[tCol] || '0', price: r[pCol] || 'TBD'});
+                        }
+                    });
+                    flush(currentSection);
+                    list.appendChild(cont);
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        function sendEmail() {
+            const checks = document.querySelectorAll('.order-check:checked');
+            if (checks.length === 0) return;
+            let items = "";
+            checks.forEach(c => items += "- " + c.value + "%0A");
+            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Order&body=${items}`;
+        }
+    </script>
+</body>
+</html>
