@@ -1,54 +1,91 @@
-/* Add this to hide the admin button properly */
-#admin-zone { display: none; }
-
-.navigation-bar {
-    background: #c0c0c0;
-    padding: 5px;
-    border-bottom: 2px solid #888;
-    display: flex;
-    align-items: center;
-    font-size: 12px;
-    color: #000;
+/* FORCE DARK THEME */
+html, body {
+    background-color: #000 !important;
+    color: #0f0 !important;
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+    height: 100%;
 }
 
-#back-btn {
-    background: #c0c0c0;
-    border: 2px outset #fff;
-    margin-right: 10px;
-    font-weight: bold;
-    cursor: pointer;
-}
+/* HIDE ADMIN BUTTON FROM SHOPPERS */
+#admin-zone { display: none !important; }
 
-/* Big Folder Buttons for Main Screen */
-.folder-icon {
-    background: #c0c0c0;
-    border: 3px outset #fff;
-    margin: 15px;
-    padding: 20px;
-    text-align: center;
-    color: #000;
-    font-weight: bold;
+/* LOADING SCREEN */
+#loader {
+    height: 100vh;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
-    cursor: pointer;
+    background: #000;
+}
+.bar-container { width: 200px; height: 10px; border: 1px solid #0f0; margin-top: 10px; }
+#fill { height: 100%; background: #0f0; width: 0%; animation: load 3s forwards; }
+@keyframes load { to { width: 100%; } }
+
+/* APP LAYOUT */
+.winamp-container {
+    width: 95vw;
+    margin: 10px auto;
+    background: #c0c0c0;
+    border: 3px outset #fff;
+    color: #000;
 }
 
-.folder-icon:active { border-style: inset; }
-
-.folder-icon::before {
-    content: "📁";
-    font-size: 40px;
-    margin-bottom: 10px;
-}
-
-/* Section Titles (inside the folders) */
-.section-header {
-    background: #444;
-    color: #00ff00;
-    padding: 10px;
-    font-size: 14px;
-    margin-top: 15px;
-    border-left: 5px solid #00ff00;
+.title-bar {
+    background: linear-gradient(90deg, #000080, #0878c0);
+    color: white;
+    padding: 5px;
+    font-size: 12px;
     font-weight: bold;
 }
+
+#menu-list {
+    background: #000;
+    margin: 5px;
+    border: 2px inset #fff;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* COLLAPSIBLE CATEGORIES (Sheets) */
+.category-btn {
+    width: 100%;
+    padding: 15px;
+    background: #888;
+    color: #fff;
+    text-align: left;
+    border: 2px outset #eee;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.category-content {
+    display: none; /* Hidden until clicked */
+    background: #111;
+}
+
+/* SUB-TITLES (Sections inside sheets) */
+.section-header {
+    background: #222;
+    color: #0f0;
+    padding: 8px;
+    font-size: 13px;
+    border-bottom: 1px solid #0f0;
+    text-transform: uppercase;
+}
+
+.item-row {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #333;
+}
+
+.item-row input { width: 20px; height: 20px; margin-right: 15px; }
+.strain { color: #fff; font-size: 15px; font-weight: bold; }
+.details { color: #0f0; font-size: 11px; display: block; }
+
+.footer { padding: 10px; background: #c0c0c0; }
+.order-btn { width: 100%; padding: 15px; background: #0f0; font-weight: bold; border: 3px outset #fff; }
