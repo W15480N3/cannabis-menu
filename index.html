@@ -11,231 +11,133 @@
             --summa-gold-glow: rgba(238, 180, 59, 0.2);
             --summa-black: #050505;
             --summa-grey: #1a1a1a;
-            --summa-red: #ff4444;
         }
 
         html, body { 
-            background: var(--summa-black); 
-            color: #d1d1d1; 
-            font-family: 'Courier New', monospace; 
-            margin: 0; padding: 0; overflow: hidden;
-            height: 100vh; height: 100dvh; 
-            width: 100%;
+            background: var(--summa-black); color: #d1d1d1; 
+            font-family: 'Courier New', monospace; margin: 0; padding: 0; 
+            overflow: hidden; height: 100dvh; width: 100%;
         }
 
-        /* CRT SCANLINES & JITTER */
+        /* CRT Effects */
         body::after {
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(238, 180, 59, 0.03) 2px);
             pointer-events: none; z-index: 10001;
-            animation: flicker 0.15s infinite, screenShake 10s infinite;
-        }
-        @keyframes flicker { 0% { opacity: 0.9; } 50% { opacity: 1; } 100% { opacity: 0.95; } }
-        @keyframes screenShake { 0%, 90% { transform: translateY(0); } 91% { transform: translateY(1px); } 92% { transform: translateY(-1px); } 93% { transform: translateY(0); } }
-
-        /* LOADER */
-        #loader { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            display: flex; flex-direction: column; justify-content: center; 
-            align-items: center; background: var(--summa-black); z-index: 10000; 
-            transition: opacity 0.8s ease;
-        }
-        .loader-container { position: relative; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; }
-        .alien-circle { position: absolute; width: 100%; height: 100%; border: 2px solid rgba(238, 180, 59, 0.1); border-radius: 50%; border-top-color: var(--summa-gold); animation: spin 0.8s linear infinite; }
-        .leaf-icon { width: 60px; height: 60px; fill: var(--summa-gold); animation: pulse 1.5s ease-in-out infinite; }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { opacity: 0.6; transform: scale(0.9); filter: drop-shadow(0 0 5px var(--summa-gold)); } 50% { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 15px var(--summa-gold)); } }
-
-        /* MAIN APP */
-        #app { 
-            display: none; width: 100%; height: 100vh; height: 100dvh; 
-            max-width: 450px; margin: 0 auto; background: var(--summa-grey); 
-            flex-direction: column; position: relative;
         }
 
-        .logo-bar { 
-            background: var(--summa-black); padding: 25px 10px 10px 10px; text-align: center; 
-            border-bottom: 1px solid var(--summa-gold); flex-shrink: 0;
-            display: flex; flex-direction: column; align-items: center;
-        }
-        .logo-img { max-width: 250px; width: 80%; height: auto; animation: logoPulse 4s ease-in-out infinite; }
-        @keyframes logoPulse { 0%, 100% { filter: drop-shadow(0 0 5px var(--summa-gold-glow)); transform: scale(1); } 50% { filter: drop-shadow(0 0 20px rgba(238, 180, 59, 0.4)); transform: scale(1.02); } }
+        #loader { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--summa-black); z-index: 10000; }
+        #app { display: none; width: 100%; height: 100dvh; max-width: 450px; margin: 0 auto; background: var(--summa-grey); flex-direction: column; }
 
-        .creator-tag {
-            font-size: 8px; color: rgba(238, 180, 59, 0.4); 
-            letter-spacing: 2px; text-transform: uppercase; padding: 10px 0;
-            animation: ledBlink 6s infinite;
-        }
-        @keyframes ledBlink { 0%, 90%, 100% { opacity: 0.4; } 92%, 96% { opacity: 1; } 94% { opacity: 0.2; } }
-
-        #menu-list { 
-            background: #000; flex-grow: 1; overflow-y: auto; margin: 0 5px 0 5px; 
-            border-radius: 8px 8px 0 0; border: 1px solid #222; box-shadow: inset 0 0 20px var(--summa-gold-glow);
-            -webkit-overflow-scrolling: touch;
-        }
+        .logo-bar { background: var(--summa-black); padding: 20px 10px; text-align: center; border-bottom: 1px solid var(--summa-gold); flex-shrink: 0; }
+        .logo-img { max-width: 220px; width: 70%; height: auto; }
         
+        #menu-list { background: #000; flex-grow: 1; overflow-y: auto; margin: 0 5px; border: 1px solid #222; -webkit-overflow-scrolling: touch; }
+
         .category-btn { width: 100%; padding: 18px; background: var(--summa-grey); color: var(--summa-gold); text-align: left; border: none; border-bottom: 1px solid #222; font-weight: bold; display: flex; justify-content: space-between; }
-        .category-content { display: none; background: rgba(238, 180, 59, 0.03); }
-
-        .item-row { display: flex; align-items: center; padding: 14px; border-bottom: 1px solid #111; transition: background 0.3s; position: relative; overflow: hidden; }
-        .item-row:active { background: rgba(238, 180, 59, 0.1); }
-        .item-row input:checked + div { animation: textGlow 2s infinite; }
-        @keyframes textGlow { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-        .item-row input[type="checkbox"] { appearance: none; width: 22px; height: 22px; border: 1px solid var(--summa-gold); border-radius: 4px; margin-right: 15px; position: relative; z-index: 2; }
-        .item-row input:checked { background: var(--summa-gold); box-shadow: 0 0 10px var(--summa-gold); }
-
-        .section-header { background: #111; color: var(--summa-gold); padding: 10px 15px; font-size: 11px; border-bottom: 1px solid #222; }
-
-        /* FOOTER */
-        .footer { 
-            padding: 10px 20px; padding-bottom: calc(15px + env(safe-area-inset-bottom)); 
-            background: var(--summa-black); display: flex; flex-direction: column; gap: 8px;
-            border-top: 1px solid var(--summa-gold); flex-shrink: 0; z-index: 10;
-        }
-        .order-btn { 
-            width: 100%; padding: 16px; background: var(--summa-gold); color: #000; 
-            border: none; border-radius: 4px; font-weight: 900; text-transform: uppercase; 
-            transition: all 0.2s; position: relative;
-            animation: btnBreath 3s infinite ease-in-out;
-        }
+        .category-content { display: none; }
         
-        #count-badge {
-            background: #000; color: var(--summa-gold); 
-            padding: 2px 8px; border-radius: 10px; font-size: 10px; margin-left: 8px;
-            border: 1px solid var(--summa-gold); vertical-align: middle;
-        }
-
-        @keyframes btnBreath { 0%, 100% { box-shadow: 0 0 5px var(--summa-gold-glow); } 50% { box-shadow: 0 0 20px var(--summa-gold); } }
+        .item-row { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #111; cursor: pointer; }
+        .item-info { flex-grow: 1; margin-left: 10px; }
         
-        .error-shake {
-            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both !important;
-            background: var(--summa-red) !important;
-            box-shadow: 0 0 20px var(--summa-red) !important;
-        }
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-2px, 0, 0); }
-            20%, 80% { transform: translate3d(4px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
-            40%, 60% { transform: translate3d(6px, 0, 0); }
-        }
+        .order-check { appearance: none; width: 22px; height: 22px; border: 1px solid var(--summa-gold); border-radius: 3px; position: relative; flex-shrink: 0; z-index: 2; }
+        .order-check:checked { background: var(--summa-gold); box-shadow: 0 0 10px var(--summa-gold); }
 
-        .clear-btn { background: transparent; color: #777; border: 1px solid #333; padding: 8px; font-size: 11px; border-radius: 4px; text-transform: uppercase; }
+        /* DETAIL PANEL */
+        #detail-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            z-index: 5000; justify-content: center; align-items: center; padding: 20px;
+        }
+        .detail-box {
+            background: var(--summa-grey); border: 1px solid var(--summa-gold);
+            width: 100%; max-width: 320px; padding: 20px; border-radius: 4px;
+            box-shadow: 0 0 30px var(--summa-gold-glow);
+        }
+        .detail-label { color: var(--summa-gold); font-size: 9px; text-transform: uppercase; margin-top: 12px; letter-spacing: 1px; }
+        .detail-val { color: #fff; font-size: 15px; margin-bottom: 4px; border-bottom: 1px solid #333; padding-bottom: 2px; word-break: break-all; }
 
-        /* MODAL */
-        #confirm-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 20000; justify-content: center; align-items: center; }
-        .modal-box { background: var(--summa-grey); border: 1px solid var(--summa-gold); padding: 25px; border-radius: 8px; text-align: center; box-shadow: 0 0 40px var(--summa-gold); width: 85%; max-width: 320px; box-sizing: border-box; animation: modalSlide 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28); }
-        @keyframes modalSlide { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .footer { padding: 10px 20px; padding-bottom: calc(15px + env(safe-area-inset-bottom)); background: var(--summa-black); border-top: 1px solid var(--summa-gold); flex-shrink: 0; }
+        .order-btn { width: 100%; padding: 16px; background: var(--summa-gold); color: #000; border: none; border-radius: 4px; font-weight: 900; text-transform: uppercase; }
+        #count-badge { background: #000; color: var(--summa-gold); padding: 2px 6px; border-radius: 10px; font-size: 10px; margin-left: 5px; border: 1px solid var(--summa-gold); }
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <div class="loader-container">
-            <div class="alien-circle"></div>
-            <svg class="leaf-icon" viewBox="0 0 24 24"><path d="M12,2C12,2 11,7 8.5,8.5C6,10 2,10 2,10C2,10 7,11 8.5,13.5C10,16 10,20 10,20C10,20 11,15 13.5,13.5C16,12 20,12 20,12C20,12 15,11 13.5,8.5C12,6 12,2 12,2Z"/></svg>
-        </div>
-        <div id="loading-text" style="margin-top:30px; color: var(--summa-gold); font-size: 12px; letter-spacing: 4px; height: 1.2em;">INITIALIZING...</div>
+        <div style="color: var(--summa-gold); font-size: 12px; letter-spacing: 4px;">SYNCING METRC DATA...</div>
     </div>
 
-    <div id="confirm-overlay">
-        <div class="modal-box">
-            <div style="color:var(--summa-gold); font-weight:bold; letter-spacing:2px; margin-bottom:15px; font-size: 14px;">TERMINAL PROMPT</div>
-            <p style="color:#fff; font-size: 13px; margin-bottom:20px; line-height:1.5;">Are you sure you want to clear your bag?</p>
-            <div style="display:flex; gap:10px;">
-                <button onclick="executeClear(true)" style="flex:1; padding:12px; background:var(--summa-gold); border:none; color:#000; font-weight:bold; cursor:pointer; border-radius:4px;">YES</button>
-                <button onclick="executeClear(false)" style="flex:1; padding:12px; background:transparent; border:1px solid #444; color:#888; cursor:pointer; border-radius:4px;">CANCEL</button>
+    <div id="detail-overlay" onclick="closeDetail()">
+        <div class="detail-box" onclick="event.stopPropagation()">
+            <div id="det-strain" style="color:var(--summa-gold); font-weight:bold; font-size:18px; margin-bottom:15px; border-bottom: 1px solid var(--summa-gold); padding-bottom:5px;">STRAIN_NAME</div>
+            
+            <div class="detail-label">METRC ID</div>
+            <div id="det-metrc" class="detail-val">--</div>
+
+            <div class="detail-label">Lot Number</div>
+            <div id="det-lot" class="detail-val">--</div>
+
+            <div style="display: flex; gap: 20px;">
+                <div style="flex: 1;">
+                    <div class="detail-label">Harvest Date</div>
+                    <div id="det-harvest" class="detail-val">--</div>
+                </div>
+                <div style="flex: 1;">
+                    <div class="detail-label">Available Qty</div>
+                    <div id="det-qty" class="detail-val">--</div>
+                </div>
             </div>
+
+            <div class="detail-label">Potency (THC)</div>
+            <div id="det-thc" class="detail-val">0%</div>
+
+            <button onclick="closeDetail()" style="width:100%; margin-top:20px; padding:12px; background:transparent; border:1px solid #444; color:#888; font-family:monospace; cursor:pointer;">RETURN TO TERMINAL</button>
         </div>
     </div>
 
     <div id="app">
         <div class="logo-bar">
             <img src="summa.webp" alt="SUMMA" class="logo-img">
-            <div class="creator-tag">TERMINAL FW: 702WISH-OS_V1.1</div>
+            <div style="font-size:8px; color:rgba(238,180,59,0.5); margin-top:5px; letter-spacing: 2px;">702WISH x METRC COMPLIANCE V2.1</div>
         </div>
         <div id="menu-list"></div>
         <div class="footer">
-            <button id="order-btn" class="order-btn" onclick="sendEmail()">
-                CHECK AVAILABILITY <span id="count-badge" style="display:none">0</span>
+            <button class="order-btn" onclick="sendEmail()">
+                REQUEST AVAILABILITY <span id="count-badge" style="display:none">0</span>
             </button>
-            <button class="clear-btn" onclick="clearSelections()">Clear Selections</button>
         </div>
     </div>
 
     <script>
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playBeep(freq, duration) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        function playBeep(f, d) {
+            const osc = audioCtx.createOscillator(); const g = audioCtx.createGain();
+            osc.frequency.value = f; g.gain.value = 0.05;
+            osc.connect(g); g.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + d);
         }
+
+        function showDetail(strain, metrc, lot, harvest, qty, thc) {
+            playBeep(600, 0.05);
+            document.getElementById('det-strain').innerText = strain;
+            document.getElementById('det-metrc').innerText = metrc || 'NOT LISTED';
+            document.getElementById('det-lot').innerText = lot || 'PENDING';
+            document.getElementById('det-harvest').innerText = harvest || 'N/A';
+            document.getElementById('det-qty').innerText = qty || 'INQUIRE';
+            document.getElementById('det-thc').innerText = thc + '%';
+            document.getElementById('detail-overlay').style.display = 'flex';
+        }
+
+        function closeDetail() { document.getElementById('detail-overlay').style.display = 'none'; }
 
         function updateCounter() {
             const count = document.querySelectorAll('.order-check:checked').length;
             const badge = document.getElementById('count-badge');
-            if (count > 0) {
-                badge.innerText = count;
-                badge.style.display = 'inline-block';
-            } else {
-                badge.style.display = 'none';
-            }
+            badge.innerText = count;
+            badge.style.display = count > 0 ? 'inline-block' : 'none';
         }
 
-        const phrases = ["INITIALIZING...", "DECRYPTING MENU...", "SYNCING STOCKS...", "LOADING SUMMA..."];
-        let phraseIdx = 0;
-        const loaderText = document.getElementById('loading-text');
-        
-        setInterval(() => {
-            if(document.getElementById('loader').style.display !== 'none') {
-                loaderText.innerText = phrases[phraseIdx % phrases.length];
-                phraseIdx++;
-            }
-        }, 600);
-
-        function toggleCategory(id) {
-            playBeep(350, 0.1); 
-            const content = document.getElementById(id);
-            const isOpen = content.style.display === "block";
-            document.querySelectorAll('.category-content').forEach(c => c.style.display = "none");
-            if (!isOpen) content.style.display = "block";
-        }
-
-        function clearSelections() {
-            playBeep(300, 0.1);
-            document.getElementById('confirm-overlay').style.display = 'flex';
-        }
-
-        function executeClear(confirmed) {
-            document.getElementById('confirm-overlay').style.display = 'none';
-            if (confirmed) {
-                playBeep(150, 0.3);
-                document.querySelectorAll('.order-check').forEach(cb => cb.checked = false);
-                updateCounter();
-            }
-        }
-
-        window.onload = () => {
-            loadMenu();
-            setTimeout(() => {
-                const loader = document.getElementById('loader');
-                loader.style.opacity = '0';
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                    document.getElementById('app').style.display = 'flex';
-                    playBeep(880, 0.05);
-                }, 800);
-            }, 2500);
-        };
-
-        async function loadMenu() {
+        window.onload = async () => {
             try {
                 const resp = await fetch('menu.xlsx');
                 const buf = await resp.arrayBuffer();
@@ -244,121 +146,60 @@
 
                 wb.SheetNames.forEach((name, idx) => {
                     const rows = XLSX.utils.sheet_to_json(wb.Sheets[name], {header: 1});
-                    const b = document.createElement('button');
-                    b.className = "category-btn";
-                    b.innerHTML = `<span>${name.toUpperCase()}</span> <span>▼</span>`;
-                    b.onclick = () => toggleCategory('cat-' + idx);
-                    list.appendChild(b);
+                    if (rows.length === 0) return;
+
+                    const btn = document.createElement('button');
+                    btn.className = "category-btn";
+                    btn.innerHTML = `<span>${name.toUpperCase()}</span> <span>▼</span>`;
+                    btn.onclick = () => {
+                        const c = document.getElementById('cat-'+idx);
+                        c.style.display = c.style.display === 'block' ? 'none' : 'block';
+                    };
+                    list.appendChild(btn);
 
                     const cont = document.createElement('div');
-                    cont.id = 'cat-' + idx;
-                    cont.className = "category-content";
-                    cont.style.display = "none";
+                    cont.id = 'cat-'+idx; cont.className = 'category-content';
+                    
+                    const h = rows[0].map(val => String(val).trim());
+                    const findCol = (targets) => h.findIndex(col => targets.some(t => col.includes(t)));
 
-                    let sCol = -1, tCol = -1, pCol = -1;
-                    let currentItems = [];
-                    let currentSection = "General";
+                    const sIdx = findCol(['Strain']);
+                    const tIdx = findCol(['THC']);
+                    const hIdx = findCol(['Harvest']);
+                    const qIdx = findCol(['Quantity', 'Qty']);
+                    const lIdx = findCol(['Lot', 'Lot #', 'Lot*']); // Asterisk safe
+                    const mIdx = findCol(['METRC', 'Metrc']);
 
-                    const flush = (title) => {
-                        if (currentItems.length > 0) {
-                            const h = document.createElement('div');
-                            h.className = "section-header";
-                            h.innerText = title;
-                            cont.appendChild(h);
-
-                            currentItems.sort((a, b) => {
-                                let vA = parseFloat(a.thc.toString().replace(/[^0-9.]/g, '')) || 0;
-                                let vB = parseFloat(b.thc.toString().replace(/[^0-9.]/g, '')) || 0;
-                                return vB - vA;
-                            });
-
-                            currentItems.forEach(item => {
-                                const r = document.createElement('div');
-                                r.className = 'item-row';
-                                r.onclick = (e) => {
-                                    const chk = r.querySelector('input');
-                                    if(e.target.type !== 'checkbox') {
-                                        chk.checked = !chk.checked;
-                                    }
-                                    playBeep(600, 0.05);
-                                    updateCounter();
-                                };
-                                r.innerHTML = `
-                                    <input type="checkbox" class="order-check" 
-                                           data-category="${name}" 
-                                           data-strain="${item.name}" 
-                                           data-thc="${item.thc}" 
-                                           data-price="${item.price}">
-                                    <div>
-                                        <div style="font-weight:bold; color:#fff; font-size:14px;">${item.name}</div>
-                                        <div style="color:var(--summa-gold); font-size:11px; margin-top:4px;">THC: ${item.thc}% | $${item.price}</div>
-                                    </div>
-                                `;
-                                cont.appendChild(r);
-                            });
-                            currentItems = [];
-                        }
-                    };
-
-                    rows.forEach(r => {
-                        if (r.includes("Strain")) {
-                            sCol = r.indexOf("Strain");
-                            tCol = r.findIndex(c => c && c.toString().includes("THC"));
-                            pCol = r.findIndex(c => c && c.toString().includes("Price"));
-                            return;
-                        }
-                        if (r[0] && !r[tCol]) {
-                            flush(currentSection);
-                            currentSection = r[0];
-                        } else if (sCol > -1 && r[sCol]) {
-                            currentItems.push({name: r[sCol], thc: r[tCol] || '0', price: r[pCol] || 'TBD'});
-                        }
+                    rows.slice(1).forEach(r => {
+                        if(!r[sIdx]) return;
+                        const row = document.createElement('div');
+                        row.className = 'item-row';
+                        row.innerHTML = `
+                            <input type="checkbox" class="order-check" data-strain="${r[sIdx]}">
+                            <div class="item-info" onclick="showDetail('${r[sIdx]}', '${r[mIdx]||''}', '${r[lIdx]||''}', '${r[hIdx]||''}', '${r[qIdx]||''}', '${r[tIdx]||''}')">
+                                <div style="font-weight:bold; color:#fff;">${r[sIdx]}</div>
+                                <div style="font-size:10px; color:var(--summa-gold);">THC: ${r[tIdx]}% | CLICK FOR DETAILS</div>
+                            </div>
+                        `;
+                        row.querySelector('.order-check').onclick = (e) => { e.stopPropagation(); updateCounter(); };
+                        cont.appendChild(row);
                     });
-                    flush(currentSection);
                     list.appendChild(cont);
                 });
-            } catch (e) { console.error(e); }
-        }
+            } catch (e) { console.error("Excel Error:", e); }
+
+            setTimeout(() => { 
+                document.getElementById('loader').style.display='none'; 
+                document.getElementById('app').style.display='flex'; 
+            }, 1500);
+        };
 
         function sendEmail() {
-            const btn = document.getElementById('order-btn');
             const checks = document.querySelectorAll('.order-check:checked');
-            
-            if (checks.length === 0) {
-                playBeep(100, 0.1); 
-                playBeep(80, 0.2);
-                btn.classList.add('error-shake');
-                setTimeout(() => btn.classList.remove('error-shake'), 400);
-                return;
-            }
-
-            playBeep(440, 0.1);
-            let emailBody = "Checking availability for:%0A%0A";
-            const categories = {};
-            checks.forEach(c => {
-                const cat = c.getAttribute('data-category');
-                if (!categories[cat]) categories[cat] = [];
-                categories[cat].push({
-                    name: c.getAttribute('data-strain'),
-                    thc: c.getAttribute('data-thc'),
-                    price: c.getAttribute('data-price')
-                });
-            });
-
-            for (const cat in categories) {
-                emailBody += `[ ${cat.toUpperCase()} ]%0A`;
-                categories[cat].forEach(item => {
-                    emailBody += ` - ${item.name} (THC: ${item.thc}% | $${item.price})%0A`;
-                });
-                emailBody += `%0A`;
-            }
-
-            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Availability Request&body=${emailBody}`;
-            
-            setTimeout(() => {
-                document.querySelectorAll('.order-check').forEach(cb => cb.checked = false);
-                updateCounter();
-            }, 1000);
+            if (checks.length === 0) return;
+            let body = "Summa Wholesale Availability Request:%0A%0A";
+            checks.forEach(c => body += `- ${c.dataset.strain}%0A`);
+            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Request&body=${body}`;
         }
     </script>
 </body>
