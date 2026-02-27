@@ -18,7 +18,7 @@
             color: #d1d1d1; 
             font-family: 'Courier New', monospace; 
             margin: 0; padding: 0; overflow: hidden;
-            height: 100vh;
+            height: 100%; width: 100%;
         }
 
         /* GOLD SCANLINES WITH FLICKER */
@@ -52,44 +52,43 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 0.6; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1.05); } }
 
-        /* THE INTERFACE */
+        /* THE INTERFACE - FIXED HEIGHT WRAPPER */
         #app { 
-            display: none; width: 95vw; max-width: 450px; margin: 10px auto; 
-            background: var(--summa-grey); border: 1px solid #333; 
-            border-radius: 12px; position: relative;
+            display: none; width: 100vw; height: 100vh;
+            max-width: 450px; margin: 0 auto; 
+            background: var(--summa-grey); 
+            position: relative;
             box-shadow: 0 0 50px rgba(0,0,0,1), 0 0 20px var(--summa-gold-glow);
-            height: calc(100vh - 20px); /* Fill screen height */
-            display: flex;
             flex-direction: column;
         }
 
         .logo-bar { 
-            background: var(--summa-black); padding: 30px 20px; 
+            background: var(--summa-black); padding: 25px 20px; 
             text-align: center; border-bottom: 1px solid var(--summa-gold);
             display: flex; justify-content: center; align-items: center;
+            flex-shrink: 0; /* Prevent header from squishing */
         }
 
         .logo-img {
-            max-width: 240px; /* Bigger logo */
-            width: 80%;
-            height: auto;
+            max-width: 260px; width: 85%; height: auto;
             filter: drop-shadow(0 0 10px var(--summa-gold-glow));
             animation: logoPulse 4s ease-in-out infinite;
         }
 
         @keyframes logoPulse { 0%, 100% { filter: drop-shadow(0 0 5px var(--summa-gold-glow)); } 50% { filter: drop-shadow(0 0 15px rgba(238, 180, 59, 0.4)); } }
 
+        /* SCROLLABLE SECTION */
         #menu-list { 
             background: #000; 
-            flex-grow: 1; /* Automatically takes up all available space */
-            margin: 10px; 
-            border: 1px solid #222; border-radius: 8px;
+            flex-grow: 1; 
             overflow-y: auto;
+            border: 1px solid #222; margin: 5px; border-radius: 8px;
             box-shadow: inset 0 0 25px var(--summa-gold-glow);
+            -webkit-overflow-scrolling: touch; /* Smooth scroll for iOS */
         }
         
         .category-btn { 
-            width: 100%; padding: 20px; 
+            width: 100%; padding: 18px; 
             background: var(--summa-grey);
             color: var(--summa-gold); text-align: left; border: none;
             border-bottom: 1px solid #222; font-weight: bold; 
@@ -97,46 +96,45 @@
         }
 
         .category-content { display: none; background: rgba(238, 180, 59, 0.05); }
-        
         .section-header { 
             background: #111; color: var(--summa-gold); 
             padding: 10px 15px; font-size: 11px; border-bottom: 1px solid #222;
-            text-transform: uppercase; letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         .item-row { display: flex; align-items: center; padding: 14px; border-bottom: 1px solid #111; cursor: pointer; }
-        
         .item-row input[type="checkbox"] { 
             appearance: none; width: 22px; height: 22px; 
             border: 1px solid var(--summa-gold); border-radius: 4px; margin-right: 15px; 
-            cursor: pointer;
         }
         .item-row input:checked { background: var(--summa-gold); }
 
+        /* PINNED FOOTER */
         .footer { 
-            padding: 10px 20px 15px 20px; 
-            background: var(--summa-grey); 
+            padding: 15px 20px; 
+            background: var(--summa-black); 
             display: flex; 
             flex-direction: column; 
-            gap: 8px;
-            border-top: 1px solid #333;
+            gap: 10px;
+            border-top: 2px solid var(--summa-gold);
+            flex-shrink: 0; /* Ensures it stays visible */
         }
         
         .order-btn { 
             width: 100%; padding: 18px; 
             background: var(--summa-gold); color: var(--summa-black); 
-            border: none; border-radius: 4px; 
-            font-weight: 800; cursor: pointer;
+            border: none; border-radius: 6px; 
+            font-weight: 900; cursor: pointer;
             box-shadow: 0 0 15px var(--summa-gold-glow);
-            text-transform: uppercase;
+            text-transform: uppercase; letter-spacing: 1px;
         }
 
         .clear-btn {
-            background: transparent; color: #666; border: none;
-            padding: 5px; font-size: 10px; cursor: pointer;
-            text-transform: uppercase; letter-spacing: 1px; transition: 0.3s;
+            background: transparent; color: #888; border: 1px solid #333;
+            padding: 8px; font-size: 10px; cursor: pointer; border-radius: 4px;
+            text-transform: uppercase; letter-spacing: 2px; align-self: center;
         }
-        .clear-btn:hover { color: var(--summa-gold); }
+        .clear-btn:hover { color: var(--summa-gold); border-color: var(--summa-gold); }
     </style>
 </head>
 <body>
@@ -155,10 +153,13 @@
         <div class="logo-bar">
             <img src="summa.webp" alt="SUMMA" class="logo-img">
         </div>
-        <div id="menu-list"></div>
+
+        <div id="menu-list">
+            </div>
+
         <div class="footer">
-            <button class="order-btn" onclick="playBeep(440, 0.1); sendEmail()">REQUEST QUOTE</button>
-            <button class="clear-btn" onclick="clearSelections()">Clear Selections</button>
+            <button class="order-btn" onclick="playBeep(440, 0.1); sendEmail()">CHECK AVAILABILITY</button>
+            <button class="clear-btn" onclick="clearSelections()">Clear All</button>
         </div>
     </div>
 
@@ -188,7 +189,7 @@
 
         function clearSelections() {
             playBeep(300, 0.1);
-            if (confirm("Clear all selected items?")) {
+            if (confirm("Reset all selections?")) {
                 playBeep(150, 0.3);
                 document.querySelectorAll('.order-check').forEach(cb => cb.checked = false);
             }
@@ -201,7 +202,7 @@
                 loader.style.opacity = '0';
                 setTimeout(() => {
                     loader.style.display = 'none';
-                    document.getElementById('app').style.display = 'flex'; // Changed to flex for alignment
+                    document.getElementById('app').style.display = 'flex';
                     playBeep(880, 0.05);
                 }, 800);
             }, 2500);
@@ -292,9 +293,9 @@
 
         function sendEmail() {
             const checks = document.querySelectorAll('.order-check:checked');
-            if (checks.length === 0) return;
+            if (checks.length === 0) return alert("Select items to check availability.");
 
-            let emailBody = "I am interested in the following wholesale items:%0A%0A";
+            let emailBody = "Hello Summa Team,%0A%0AChecking availability for the following wholesale items:%0A%0A";
             const categories = {};
             checks.forEach(c => {
                 const cat = c.getAttribute('data-category');
@@ -314,7 +315,7 @@
                 emailBody += `%0A`;
             }
 
-            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Quote Request&body=${emailBody}`;
+            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Availability Request&body=${emailBody}`;
         }
     </script>
 </body>
