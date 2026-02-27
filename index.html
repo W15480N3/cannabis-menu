@@ -3,74 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SUMMA WHOLESALE TERMINAL</title>
+    <title>SUMMA WHOLESALE</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root { --summa-gold: #eeb43b; --summa-black: #050505; --summa-grey: #1a1a1a; }
-        html, body { background: var(--summa-black); color: #d1d1d1; font-family: 'Courier New', monospace; margin: 0; padding: 0; overflow: hidden; height: 100dvh; width: 100%; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { background: var(--summa-black); color: #d1d1d1; font-family: 'Courier New', monospace; margin: 0; padding: 0; overflow: hidden; height: 100dvh; }
         
-        #loader { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--summa-black); z-index: 10000; }
-        #app { display: none; width: 100%; height: 100dvh; max-width: 450px; margin: 0 auto; background: var(--summa-grey); flex-direction: column; }
+        #loader { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--summa-black); z-index: 10000; color: var(--summa-gold); }
+        #app { display: none; width: 100%; height: 100dvh; max-width: 450px; margin: 0 auto; background: var(--summa-grey); flex-direction: column; position: relative; }
 
-        .logo-bar { background: var(--summa-black); padding: 25px 10px; text-align: center; border-bottom: 1px solid var(--summa-gold); flex-shrink: 0; }
-        .logo-img { max-width: 220px; width: 70%; height: auto; }
+        .logo-bar { background: var(--summa-black); padding: 20px 10px; text-align: center; border-bottom: 1px solid var(--summa-gold); flex-shrink: 0; }
+        .logo-img { max-width: 200px; width: 60%; height: auto; }
         
-        #menu-list { background: #000; flex-grow: 1; overflow-y: auto; margin: 0 5px; border: 1px solid #222; -webkit-overflow-scrolling: touch; }
+        #menu-list { background: #000; flex-grow: 1; overflow-y: auto; border: 1px solid #222; -webkit-overflow-scrolling: touch; }
         
-        /* CATEGORY DROPDOWNS */
+        /* DROPDOWNS */
         .category-header { 
-            background: var(--summa-grey); color: var(--summa-gold); 
-            padding: 18px 15px; font-weight: bold; font-size: 14px; 
-            text-transform: uppercase; border-bottom: 1px solid #222; 
-            cursor: pointer; display: flex; justify-content: space-between; 
+            background: #1a1a1a; color: var(--summa-gold); 
+            padding: 20px 15px; font-weight: 900; font-size: 16px; 
+            border-bottom: 1px solid #333; cursor: pointer; 
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .category-content { display: none; background: #050505; }
+        .category-content { display: none; background: #000; }
 
-        .item-row { display: flex; align-items: center; padding: 14px; border-bottom: 1px solid #111; }
-        .item-info { flex-grow: 1; margin-left: 12px; cursor: pointer; }
+        .item-row { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #111; width: 100%; }
+        .item-info { flex-grow: 1; margin-left: 15px; cursor: pointer; }
         
-        .order-check { appearance: none; width: 24px; height: 24px; border: 1px solid var(--summa-gold); border-radius: 3px; flex-shrink: 0; cursor: pointer; transition: 0.2s; }
-        .order-check:checked { background: var(--summa-gold); box-shadow: 0 0 10px var(--summa-gold); }
+        .order-check { width: 28px; height: 28px; border: 2px solid var(--summa-gold); border-radius: 4px; background: transparent; appearance: none; flex-shrink: 0; cursor: pointer; }
+        .order-check:checked { background: var(--summa-gold); }
 
-        /* DETAIL MODAL */
-        #detail-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; justify-content: center; align-items: center; padding: 20px; }
-        .detail-box { 
-            background: var(--summa-grey); border: 1px solid var(--summa-gold); 
-            width: 100%; max-width: 320px; padding: 25px; border-radius: 4px; 
-            box-shadow: 0 0 40px rgba(238, 180, 59, 0.1);
-        }
-        .detail-label { color: var(--summa-gold); font-size: 9px; text-transform: uppercase; margin-top: 15px; letter-spacing: 1px; }
-        .detail-val { color: #fff; font-size: 15px; border-bottom: 1px solid #333; padding-bottom: 4px; margin-bottom: 2px; word-break: break-all; }
+        /* MODAL */
+        #detail-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 11000; justify-content: center; align-items: center; padding: 20px; }
+        .detail-box { background: #1a1a1a; border: 1px solid var(--summa-gold); width: 100%; max-width: 340px; padding: 25px; border-radius: 4px; }
+        .detail-label { color: var(--summa-gold); font-size: 10px; margin-top: 12px; font-weight: bold; }
+        .detail-val { color: #fff; font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 4px; margin-bottom: 4px; word-break: break-all; }
 
         .footer { padding: 15px; background: var(--summa-black); border-top: 1px solid var(--summa-gold); flex-shrink: 0; }
-        .order-btn { width: 100%; padding: 18px; background: var(--summa-gold); color: #000; border: none; border-radius: 4px; font-weight: 900; font-family: inherit; font-size: 14px; letter-spacing: 1px; }
+        .order-btn { width: 100%; padding: 18px; background: var(--summa-gold); color: #000; border: none; border-radius: 4px; font-weight: 900; font-family: inherit; }
     </style>
 </head>
 <body>
 
-    <div id="loader">
-        <div style="color: var(--summa-gold); font-size: 11px; letter-spacing: 3px;">FETCHING SECURE DATA...</div>
-    </div>
+    <div id="loader">INITIALIZING TERMINAL...</div>
 
-    <div id="detail-overlay" onclick="closeDetail()">
+    <div id="detail-overlay" onclick="this.style.display='none'">
         <div class="detail-box" onclick="event.stopPropagation()">
-            <div id="det-strain" style="color:var(--summa-gold); font-weight:bold; font-size:20px; border-bottom: 2px solid var(--summa-gold); padding-bottom:10px; margin-bottom:10px;">STRAIN</div>
-            
-            <div class="detail-label">METRC ID #</div><div id="det-metrc" class="detail-val">--</div>
+            <div id="det-strain" style="color:var(--summa-gold); font-weight:bold; font-size:20px; border-bottom: 1px solid var(--summa-gold); padding-bottom:10px; margin-bottom:10px;">--</div>
+            <div class="detail-label">METRC ID</div><div id="det-metrc" class="detail-val">--</div>
             <div class="detail-label">LOT NUMBER</div><div id="det-lot" class="detail-val">--</div>
-            
-            <div style="display: flex; gap: 15px;">
-                <div style="flex: 1;">
-                    <div class="detail-label">HARVEST DATE</div><div id="det-harvest" class="detail-val">--</div>
-                </div>
-                <div style="flex: 1;">
-                    <div class="detail-label">STOCK QTY</div><div id="det-qty" class="detail-val">--</div>
-                </div>
-            </div>
-
-            <div class="detail-label">POTENCY (THC%)</div><div id="det-thc" class="detail-val">--</div>
-            
-            <button onclick="closeDetail()" style="width:100%; margin-top:25px; padding:12px; background:transparent; border:1px solid #444; color:#888; font-family:inherit; cursor:pointer;">RETURN</button>
+            <div class="detail-label">HARVEST DATE</div><div id="det-harvest" class="detail-val">--</div>
+            <div class="detail-label">STOCK QUANTITY</div><div id="det-qty" class="detail-val">--</div>
+            <div class="detail-label">THC %</div><div id="det-thc" class="detail-val">--</div>
+            <button onclick="document.getElementById('detail-overlay').style.display='none'" style="width:100%; margin-top:20px; padding:12px; background:#333; color:white; border:none; font-family:inherit;">BACK</button>
         </div>
     </div>
 
@@ -78,104 +63,97 @@
         <div class="logo-bar"><img src="summa.webp" alt="SUMMA" class="logo-img"></div>
         <div id="menu-list"></div>
         <div class="footer">
-            <button class="order-btn" onclick="sendEmail()">CHECK AVAILABILITY <span id="count-badge"></span></button>
+            <button class="order-btn" onclick="sendEmail()">REQUEST SELECTED <span id="count-badge"></span></button>
         </div>
     </div>
 
     <script>
-        function toggleCat(id) {
-            const c = document.getElementById(id);
-            const isOpen = c.style.display === 'block';
-            document.querySelectorAll('.category-content').forEach(el => el.style.display = 'none');
-            c.style.display = isOpen ? 'none' : 'block';
+        function toggle(id) {
+            const el = document.getElementById(id);
+            const isVisible = el.style.display === 'block';
+            document.querySelectorAll('.category-content').forEach(c => c.style.display = 'none');
+            el.style.display = isVisible ? 'none' : 'block';
         }
 
-        function showDetail(strain, metrc, lot, harvest, qty, thc) {
+        function showPop(strain, metrc, lot, harvest, qty, thc) {
             document.getElementById('det-strain').innerText = strain;
             document.getElementById('det-metrc').innerText = metrc || 'N/A';
             document.getElementById('det-lot').innerText = lot || 'N/A';
             document.getElementById('det-harvest').innerText = harvest || 'N/A';
-            document.getElementById('det-qty').innerText = qty || 'INQUIRE';
+            document.getElementById('det-qty').innerText = qty || 'N/A';
             document.getElementById('det-thc').innerText = thc || 'N/A';
             document.getElementById('detail-overlay').style.display = 'flex';
         }
 
-        function closeDetail() { document.getElementById('detail-overlay').style.display = 'none'; }
-
-        async function loadMenu() {
+        async function init() {
             try {
-                const resp = await fetch('menu.xlsx');
-                if (!resp.ok) throw new Error("Missing menu.xlsx");
-                
-                const buf = await resp.arrayBuffer();
-                const wb = XLSX.read(new Uint8Array(buf), {type: 'array'});
+                const r = await fetch('menu.xlsx');
+                if(!r.ok) throw "File Not Found";
+                const b = await r.arrayBuffer();
+                const wb = XLSX.read(new Uint8Array(b), {type:'array'});
                 const list = document.getElementById('menu-list');
 
-                wb.SheetNames.forEach((name, idx) => {
-                    const rows = XLSX.utils.sheet_to_json(wb.Sheets[name], {header: 1});
-                    if (rows.length < 2) return;
+                wb.SheetNames.forEach((sName, i) => {
+                    const data = XLSX.utils.sheet_to_json(wb.Sheets[sName], {header:1});
+                    if(data.length < 1) return;
 
-                    const catId = 'cat-' + idx;
-                    const header = document.createElement('div');
-                    header.className = "category-header";
-                    header.innerHTML = `<span>${name.toUpperCase()}</span><span>+</span>`;
-                    header.onclick = () => toggleCat(catId);
-                    list.appendChild(header);
+                    const head = data[0].map(h => String(h || "").toLowerCase().replace(/[#*_\s]/g, ''));
+                    const find = (keys) => head.findIndex(h => keys.some(k => h.includes(k)));
 
-                    const cont = document.createElement('div');
-                    cont.id = catId;
-                    cont.className = 'category-content';
+                    const col = {
+                        s: find(['strain']),
+                        t: find(['thc']),
+                        h: find(['harvest']),
+                        q: find(['quant', 'qty']),
+                        l: find(['lot']),
+                        m: find(['metrc'])
+                    };
 
-                    const hRow = rows[0];
-                    // Scrub headers to be symbol-blind
-                    const f = (keys) => hRow.findIndex(col => {
-                        if (!col) return false;
-                        const clean = String(col).replace(/[#*_\s]/g, '').toLowerCase();
-                        return keys.some(k => clean.includes(k.toLowerCase()));
-                    });
+                    const catId = 'c-' + i;
+                    const hDiv = document.createElement('div');
+                    hDiv.className = 'category-header';
+                    hDiv.innerHTML = `<span>${sName.toUpperCase()}</span><span>▼</span>`;
+                    hDiv.onclick = () => toggle(catId);
+                    list.appendChild(hDiv);
 
-                    const sI = f(['strain']);
-                    const tI = f(['thc']);
-                    const hI = f(['harvest']);
-                    const qI = f(['quant', 'qty']);
-                    const lI = f(['lot']); 
-                    const mI = f(['metrc']);
+                    const cDiv = document.createElement('div');
+                    cDiv.id = catId; cDiv.className = 'category-content';
 
-                    rows.slice(1).forEach(r => {
-                        if (!r[sI]) return;
-                        const row = document.createElement('div');
-                        row.className = 'item-row';
-                        row.innerHTML = `
-                            <input type="checkbox" class="order-check" data-strain="${r[sI]}">
-                            <div class="item-info" onclick="showDetail('${r[sI]}','${r[mI]||''}','${r[lI]||''}','${r[hI]||''}','${r[qI]||''}','${r[tI]||''}')">
-                                <div style="font-weight:bold; color:#fff; font-size:15px;">${r[sI]}</div>
-                                <div style="font-size:10px; color:var(--summa-gold); margin-top:3px;">THC: ${r[tI]||'N/A'}% | TAP FOR DATA</div>
+                    data.slice(1).forEach(row => {
+                        if(!row[col.s]) return;
+                        const item = document.createElement('div');
+                        item.className = 'item-row';
+                        item.innerHTML = `
+                            <input type="checkbox" class="order-check" data-name="${row[col.s]}">
+                            <div class="item-info">
+                                <div style="font-weight:bold; color:white;">${row[col.s]}</div>
+                                <div style="font-size:11px; color:var(--summa-gold);">THC: ${row[col.t]||'--'}% | INFO ></div>
                             </div>
                         `;
-                        row.querySelector('.order-check').onchange = () => {
+                        // Fix for mobile taps
+                        item.querySelector('.item-info').onclick = () => showPop(row[col.s], row[col.m], row[col.l], row[col.h], row[col.q], row[col.t]);
+                        item.querySelector('.order-check').onchange = () => {
                             const count = document.querySelectorAll('.order-check:checked').length;
                             document.getElementById('count-badge').innerText = count > 0 ? `(${count})` : "";
                         };
-                        cont.appendChild(row);
+                        cDiv.appendChild(item);
                     });
-                    list.appendChild(cont);
+                    list.appendChild(cDiv);
                 });
-                document.getElementById('loader').style.display='none'; 
-                document.getElementById('app').style.display='flex';
-            } catch (err) { 
-                document.getElementById('loader').innerText = "SYSTEM ERROR: RELOAD APP";
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('app').style.display = 'flex';
+            } catch(e) {
+                document.getElementById('loader').innerHTML = "TERMINAL ERROR: <br>"+e+"<br>CHECK FILENAME 'menu.xlsx'";
             }
         }
 
         function sendEmail() {
-            const checks = document.querySelectorAll('.order-check:checked');
-            if (checks.length === 0) return;
-            let body = "Availability Inquiry:%0A%0A";
-            checks.forEach(c => body += `- ${c.dataset.strain}%0A`);
-            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Request&body=${body}`;
+            const selected = Array.from(document.querySelectorAll('.order-check:checked')).map(cb => cb.dataset.name);
+            if(selected.length === 0) return;
+            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Request&body=Inquiry for:%0A%0A- ${selected.join('%0A- ')}`;
         }
 
-        loadMenu();
+        init();
     </script>
 </body>
 </html>
