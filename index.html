@@ -3,78 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SUMMA WHOLESALE TERMINAL</title>
+    <title>SUMMA WHOLESALE</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
-            --summa-gold: #eeb43b; 
+            --summa-gold: #eeb43b; /* Hex color from logo */
             --summa-black: #050505;
             --summa-grey: #1a1a1a;
         }
 
-        html, body { 
+        body { 
             background: var(--summa-black); 
-            color: #d1d1d1; 
+            color: #fff; 
             font-family: 'Courier New', monospace; 
             margin: 0; padding: 0; 
         }
 
-        /* LOADING SCREEN */
+        /* LOADER STYLES */
         #loader { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             display: flex; flex-direction: column; justify-content: center; 
             align-items: center; background: var(--summa-black); z-index: 10000; 
         }
 
-        .loader-container { position: relative; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; }
-
         .alien-circle {
-            position: absolute; width: 100%; height: 100%; 
-            border: 2px solid rgba(238, 180, 59, 0.1); border-radius: 50%;
-            border-top-color: var(--summa-gold); animation: spin 1s linear infinite;
+            width: 120px; height: 120px; border: 2px solid rgba(238, 180, 59, 0.1);
+            border-radius: 50%; border-top-color: var(--summa-gold);
+            animation: spin 1s linear infinite; position: relative;
         }
 
-        .leaf-icon { width: 50px; height: 50px; fill: var(--summa-gold); animation: pulse 2s ease-in-out infinite; }
+        .leaf-icon { 
+            position: absolute; top: 50%; left: 50%; 
+            transform: translate(-50%, -50%); width: 45px; height: 45px; 
+            fill: var(--summa-gold); filter: drop-shadow(0 0 5px var(--summa-gold));
+        }
+
+        #emergency-btn {
+            display: none; margin-top: 30px; padding: 10px 20px;
+            background: transparent; color: var(--summa-gold);
+            border: 1px solid var(--summa-gold); cursor: pointer; font-size: 10px;
+        }
 
         @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
-        #app { 
-            display: none; width: 95vw; max-width: 450px; margin: 20px auto; 
-            background: var(--summa-grey); border: 1px solid #333; 
-            border-radius: 12px; overflow: hidden;
-        }
-
-        .title-bar { 
-            background: var(--summa-black); color: var(--summa-gold); padding: 15px; 
-            text-align: center; font-size: 13px; font-weight: bold;
-            border-bottom: 1px solid var(--summa-gold); letter-spacing: 2px;
-        }
-
-        #menu-list { background: #000; margin: 10px; border-radius: 8px; min-height: 200px; }
+        /* INTERFACE STYLES */
+        #app { display: none; width: 95vw; max-width: 450px; margin: 20px auto; }
         
-        .category-btn { 
-            width: 100%; padding: 18px; background: #111;
-            color: var(--summa-gold); text-align: left; border: none;
-            border-bottom: 1px solid #222; font-weight: bold; cursor: pointer;
+        .terminal-box {
+            background: var(--summa-grey); border: 2px solid #333;
+            border-radius: 12px; overflow: hidden; box-shadow: 0 0 40px #000;
         }
 
-        .category-content { display: none; padding-bottom: 10px; }
-        .item-row { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #111; }
-        
-        .item-row input { margin-right: 15px; accent-color: var(--summa-gold); transform: scale(1.2); }
+        .header { 
+            background: var(--summa-black); color: var(--summa-gold); padding: 15px;
+            text-align: center; font-weight: bold; letter-spacing: 3px;
+            border-bottom: 1px solid var(--summa-gold);
+        }
 
-        .footer { padding: 15px; }
-        .order-btn { 
-            width: 100%; padding: 18px; background: var(--summa-gold); 
-            color: #000; border: none; border-radius: 4px; font-weight: 800;
+        #menu-container { max-height: 60vh; overflow-y: auto; background: #000; margin: 10px; border-radius: 8px; }
+
+        .cat-row {
+            width: 100%; padding: 18px; background: #111; color: var(--summa-gold);
+            border: none; border-bottom: 1px solid #222; text-align: left;
+            font-weight: bold; cursor: pointer; display: flex; justify-content: space-between;
+        }
+
+        .item-list { display: none; padding: 5px 0; background: #080808; }
+
+        .strain-card {
+            display: flex; align-items: center; padding: 12px 15px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .strain-card input { margin-right: 15px; accent-color: var(--summa-gold); transform: scale(1.3); }
+
+        .price-tag { color: var(--summa-gold); font-size: 11px; margin-top: 4px; }
+
+        .footer { padding: 20px; }
+        .order-btn {
+            width: 100%; padding: 18px; background: var(--summa-gold);
+            color: #000; border: none; border-radius: 4px;
+            font-weight: 900; text-transform: uppercase; cursor: pointer;
         }
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <div class="loader-container">
-            <div class="alien-circle"></div>
+        <div class="alien-circle">
             <svg class="leaf-icon" viewBox="0 0 24 24">
-                <path d="M12,2C12,2 11,7 8.5,8.5C6,10 2,10 2,10C2,10 7,11 8.5,13.5C10,16 10,20 10,20C10,20 11,15 13.5,13.5C
+                <path d="M12,2C12,2 11,7 8.5,8.5C6,10 2,10 2,10C2,10 7,11 8.5,13.5C10,16 10,20 10,20C10,20 11,15 13.5,13.5C16,12 20,12 20,12C20,12 15,11 13.5,8.5C12,6 12,2 12,2Z"/>
+            </svg>
+        </div>
+        <div style="margin-top:20px; color: var(--summa-gold); font-size: 10px; letter-spacing: 3px;">INITIALIZING CANNABIS...</div>
+        <button id="emergency-btn" onclick="showApp()">BYPASS LOADING</button>
+    </div>
+
+    <div id="app">
+        <div class="terminal-box">
+            <div class="header">SUMMA WHOLESALE</div>
+            <div id="menu-container">
+                <p style="text-align:center; color:#555; padding:20px;">Scanning for menu.xlsx...</p>
+            </div>
+            <div class="footer">
+                <button class="order-btn" onclick="sendOrder()">Request Quote</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showApp() {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+        }
+
+        // Show bypass button if it takes too long
+        setTimeout(() => {
+            document.getElementById('emergency-btn').style.display = 'block';
+        }, 5000);
+
+        window.onload = () => {
+            fetch('menu.xlsx')
+                .then(res => {
+                    if(!res.ok) throw new Error("No file found");
+                    return res.arrayBuffer();
+                })
+                .then(data => {
+                    const wb = XLSX.read(new Uint8Array(data), {type: 'array'});
+                    render(wb);
+                    showApp();
+                })
+                .catch(err => {
+                    document.getElementById('menu-container').innerHTML = 
+                        `<div style="padding:20px; color:red; font-size:11px;">ERROR: 'menu.xlsx' not found in root folder.</div>`;
+                    showApp();
+                });
+        };
+
+        function render(wb) {
+            const container = document.getElementById('menu-container');
+            container.innerHTML = "";
+            
+            wb.SheetNames.forEach((sheetName, idx) => {
+                const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], {header: 1});
+                
+                const btn = document.createElement('button');
+                btn.className = "cat-row";
+                btn.innerHTML = `<span>${sheetName.toUpperCase()}</span> <span>+</span>`;
+                btn.onclick = () => {
+                    const list = document.getElementById('list-' + idx);
+                    list.style.display = list.style.display === "block" ? "none" : "block";
+                };
+                container.appendChild(btn);
+
+                const listDiv = document.createElement('div');
+                listDiv.id = 'list-' + idx;
+                listDiv.className = "item-list";
+                
+                // Extraction Logic
+                let items = [];
+                let sCol = -1, tCol = -1, pCol = -1;
+
+                rows.forEach(r => {
+                    if (r.includes("Strain")) {
+                        sCol = r.indexOf("Strain");
+                        tCol = r.findIndex(c => c && c.toString().includes("THC"));
+                        pCol = r.findIndex(c => c && c.toString().includes("Price"));
+                    } else if (sCol > -1 && r[sCol]) {
+                        items.push({ name: r[sCol], thc: r[tCol] || '0', price: r[pCol] || 'TBD' });
+                    }
+                });
+
+                // Sort Highest THC first
+                items.sort((a, b) => parseFloat(b.thc) - parseFloat(a.thc));
+
+                items.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'strain-card';
+                    card.innerHTML = `
+                        <input type="checkbox" class="order-check" value="${item.name}">
+                        <div>
+                            <div style="font-weight:bold; font-size:14px;">${item.name}</div>
+                            <div class="price-tag">THC: ${item.thc}% | $${item.price}</div>
+                        </div>
+                    `;
+                    listDiv.appendChild(card);
+                });
+                container.appendChild(listDiv);
+            });
+        }
+
+        function sendOrder() {
+            const selected = Array.from(document.querySelectorAll('.order-check:checked')).map(i => i.value);
+            if (selected.length === 0) return alert("Select items first.");
+            const body = "I am interested in:%0A- " + selected.join("%0A- ");
+            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Inquiry&body=${body}`;
+        }
+    </script>
+</body>
+</html>
