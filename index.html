@@ -18,13 +18,11 @@
             color: #d1d1d1; 
             font-family: 'Courier New', monospace; 
             margin: 0; padding: 0; overflow: hidden;
-            /* Fix for mobile viewport height */
-            height: 100vh;
-            height: 100dvh; 
+            height: 100vh; height: 100dvh; 
             width: 100%;
         }
 
-        /* GOLD SCANLINES */
+        /* SCANLINES */
         body::after {
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(238, 180, 59, 0.03) 2px);
@@ -33,113 +31,64 @@
         }
         @keyframes flicker { 0% { opacity: 0.9; } 50% { opacity: 1; } 100% { opacity: 0.95; } }
 
-        /* LOADING SCREEN */
+        /* LOADER */
         #loader { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             display: flex; flex-direction: column; justify-content: center; 
             align-items: center; background: var(--summa-black); z-index: 10000; 
             transition: opacity 0.8s ease;
         }
-
         .loader-container { position: relative; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; }
-        .alien-circle {
-            position: absolute; width: 100%; height: 100%; 
-            border: 2px solid rgba(238, 180, 59, 0.1); border-radius: 50%;
-            border-top-color: var(--summa-gold); animation: spin 1.2s linear infinite;
-        }
+        .alien-circle { position: absolute; width: 100%; height: 100%; border: 2px solid rgba(238, 180, 59, 0.1); border-radius: 50%; border-top-color: var(--summa-gold); animation: spin 1.2s linear infinite; }
         .leaf-icon { width: 60px; height: 60px; fill: var(--summa-gold); animation: pulse 2s ease-in-out infinite; }
 
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 0.6; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1.05); } }
 
-        /* THE INTERFACE */
+        /* MAIN APP STRUCTURE */
         #app { 
-            display: none; 
-            width: 100%; 
-            height: 100vh;
-            height: 100dvh; /* Forces fit on mobile screens */
-            max-width: 450px; 
-            margin: 0 auto; 
-            background: var(--summa-grey); 
-            flex-direction: column;
-            position: relative;
+            display: none; width: 100%; height: 100vh; height: 100dvh; 
+            max-width: 450px; margin: 0 auto; background: var(--summa-grey); 
+            flex-direction: column; position: relative;
         }
 
         .logo-bar { 
-            background: var(--summa-black); 
-            padding: 20px 10px; 
-            text-align: center; 
-            border-bottom: 1px solid var(--summa-gold);
-            flex-shrink: 0;
+            background: var(--summa-black); padding: 25px 10px; text-align: center; 
+            border-bottom: 1px solid var(--summa-gold); flex-shrink: 0;
         }
-
-        .logo-img {
-            max-width: 240px; 
-            width: 75%; 
-            height: auto;
-            filter: drop-shadow(0 0 10px var(--summa-gold-glow));
-            animation: logoPulse 4s ease-in-out infinite;
-        }
-
+        .logo-img { max-width: 250px; width: 80%; height: auto; animation: logoPulse 4s ease-in-out infinite; }
         @keyframes logoPulse { 0%, 100% { filter: drop-shadow(0 0 5px var(--summa-gold-glow)); } 50% { filter: drop-shadow(0 0 15px rgba(238, 180, 59, 0.4)); } }
 
-        /* SCROLLABLE CONTENT */
         #menu-list { 
-            background: #000; 
-            flex-grow: 1; 
-            overflow-y: auto;
-            margin: 8px; 
-            border-radius: 8px;
-            border: 1px solid #222;
-            box-shadow: inset 0 0 20px var(--summa-gold-glow);
+            background: #000; flex-grow: 1; overflow-y: auto; margin: 8px; 
+            border-radius: 8px; border: 1px solid #222; box-shadow: inset 0 0 20px var(--summa-gold-glow);
             -webkit-overflow-scrolling: touch;
         }
         
-        .category-btn { 
-            width: 100%; padding: 18px; 
-            background: var(--summa-grey);
-            color: var(--summa-gold); text-align: left; border: none;
-            border-bottom: 1px solid #222; font-weight: bold; 
-            display: flex; justify-content: space-between;
-        }
-
+        .category-btn { width: 100%; padding: 18px; background: var(--summa-grey); color: var(--summa-gold); text-align: left; border: none; border-bottom: 1px solid #222; font-weight: bold; display: flex; justify-content: space-between; }
         .category-content { display: none; background: rgba(238, 180, 59, 0.03); }
         .section-header { background: #111; color: var(--summa-gold); padding: 10px 15px; font-size: 11px; border-bottom: 1px solid #222; }
-
         .item-row { display: flex; align-items: center; padding: 14px; border-bottom: 1px solid #111; }
-        .item-row input[type="checkbox"] { 
-            appearance: none; width: 22px; height: 22px; 
-            border: 1px solid var(--summa-gold); border-radius: 4px; margin-right: 15px; 
-        }
+        .item-row input[type="checkbox"] { appearance: none; width: 22px; height: 22px; border: 1px solid var(--summa-gold); border-radius: 4px; margin-right: 15px; }
         .item-row input:checked { background: var(--summa-gold); }
 
-        /* FIXED FOOTER WITH SAFE AREA PADDING */
+        /* FOOTER */
         .footer { 
-            padding: 15px 20px;
-            padding-bottom: calc(15px + env(safe-area-inset-bottom)); /* iOS Notch protection */
-            background: var(--summa-black); 
-            display: flex; 
-            flex-direction: column; 
-            gap: 12px;
-            border-top: 1px solid var(--summa-gold);
-            flex-shrink: 0;
-            z-index: 10;
+            padding: 15px 20px; padding-bottom: calc(15px + env(safe-area-inset-bottom)); 
+            background: var(--summa-black); display: flex; flex-direction: column; gap: 12px;
+            border-top: 1px solid var(--summa-gold); flex-shrink: 0; z-index: 10;
         }
-        
-        .order-btn { 
-            width: 100%; padding: 16px; 
-            background: var(--summa-gold); color: var(--summa-black); 
-            border: none; border-radius: 4px; 
-            font-weight: 900; font-size: 14px;
-            box-shadow: 0 0 15px var(--summa-gold-glow);
-            text-transform: uppercase;
-        }
+        .order-btn { width: 100%; padding: 16px; background: var(--summa-gold); color: #000; border: none; border-radius: 4px; font-weight: 900; text-transform: uppercase; }
+        .clear-btn { background: transparent; color: #777; border: 1px solid #333; padding: 10px; font-size: 11px; border-radius: 4px; text-transform: uppercase; }
 
-        .clear-btn {
-            background: transparent; color: #777; border: 1px solid #333;
-            padding: 10px; font-size: 11px; border-radius: 4px;
-            text-transform: uppercase; letter-spacing: 1px;
-            width: 100%; /* Wider for easier thumb tapping */
+        /* CUSTOM MODAL OVERLAY */
+        #confirm-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.9); z-index: 20000; justify-content: center; align-items: center; padding: 20px;
+        }
+        .modal-box {
+            background: var(--summa-grey); border: 1px solid var(--summa-gold); padding: 30px; 
+            border-radius: 8px; text-align: center; box-shadow: 0 0 30px var(--summa-gold-glow); max-width: 320px; width: 90%;
         }
     </style>
 </head>
@@ -148,20 +97,27 @@
     <div id="loader">
         <div class="loader-container">
             <div class="alien-circle"></div>
-            <svg class="leaf-icon" viewBox="0 0 24 24">
-                <path d="M12,2C12,2 11,7 8.5,8.5C6,10 2,10 2,10C2,10 7,11 8.5,13.5C10,16 10,20 10,20C10,20 11,15 13.5,13.5C16,12 20,12 20,12C20,12 15,11 13.5,8.5C12,6 12,2 12,2Z"/>
-            </svg>
+            <svg class="leaf-icon" viewBox="0 0 24 24"><path d="M12,2C12,2 11,7 8.5,8.5C6,10 2,10 2,10C2,10 7,11 8.5,13.5C10,16 10,20 10,20C10,20 11,15 13.5,13.5C16,12 20,12 20,12C20,12 15,11 13.5,8.5C12,6 12,2 12,2Z"/></svg>
         </div>
         <div style="margin-top:30px; color: var(--summa-gold); font-size: 12px; letter-spacing: 4px;">INITIALIZING...</div>
+    </div>
+
+    <div id="confirm-overlay">
+        <div class="modal-box">
+            <div style="color:var(--summa-gold); font-weight:bold; letter-spacing:2px; margin-bottom:15px;">TERMINAL PROMPT</div>
+            <p style="color:#fff; font-size: 14px; margin-bottom:25px; line-height:1.5;">Are you sure you want to clear your bag?</p>
+            <div style="display:flex; gap:10px;">
+                <button onclick="executeClear(true)" style="flex:1; padding:12px; background:var(--summa-gold); border:none; color:#000; font-weight:bold; cursor:pointer; border-radius:4px;">YES</button>
+                <button onclick="executeClear(false)" style="flex:1; padding:12px; background:transparent; border:1px solid #444; color:#888; cursor:pointer; border-radius:4px;">CANCEL</button>
+            </div>
+        </div>
     </div>
 
     <div id="app">
         <div class="logo-bar">
             <img src="summa.webp" alt="SUMMA" class="logo-img">
         </div>
-
         <div id="menu-list"></div>
-
         <div class="footer">
             <button class="order-btn" onclick="playBeep(440, 0.1); sendEmail()">CHECK AVAILABILITY</button>
             <button class="clear-btn" onclick="clearSelections()">Clear Selections</button>
@@ -180,8 +136,7 @@
             gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + duration);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
         }
 
         function toggleCategory(id) {
@@ -192,9 +147,15 @@
             if (!isOpen) content.style.display = "block";
         }
 
+        // CUSTOM CLEAR LOGIC
         function clearSelections() {
             playBeep(300, 0.1);
-            if (confirm("Reset all selections?")) {
+            document.getElementById('confirm-overlay').style.display = 'flex';
+        }
+
+        function executeClear(confirmed) {
+            document.getElementById('confirm-overlay').style.display = 'none';
+            if (confirmed) {
                 playBeep(150, 0.3);
                 document.querySelectorAll('.order-check').forEach(cb => cb.checked = false);
             }
@@ -210,7 +171,7 @@
                     document.getElementById('app').style.display = 'flex';
                     playBeep(880, 0.05);
                 }, 800);
-            }, 2500);
+            }, 2000);
         };
 
         async function loadMenu() {
@@ -298,7 +259,7 @@
 
         function sendEmail() {
             const checks = document.querySelectorAll('.order-check:checked');
-            if (checks.length === 0) return alert("Select items first.");
+            if (checks.length === 0) return;
 
             let emailBody = "Checking availability for:%0A%0A";
             const categories = {};
@@ -320,7 +281,13 @@
                 emailBody += `%0A`;
             }
 
+            // AUTO-CLEAR BAG AFTER SENDING
             window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Availability Request&body=${emailBody}`;
+            
+            // Short delay before clearing to ensure the mailto: triggers
+            setTimeout(() => {
+                document.querySelectorAll('.order-check').forEach(cb => cb.checked = false);
+            }, 1000);
         }
     </script>
 </body>
