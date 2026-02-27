@@ -8,7 +8,6 @@
     <style>
         :root {
             --summa-gold: #eeb43b; 
-            --summa-gold-glow: rgba(238, 180, 59, 0.2);
             --summa-black: #050505;
             --summa-grey: #1a1a1a;
         }
@@ -19,125 +18,88 @@
             overflow: hidden; height: 100dvh; width: 100%;
         }
 
-        /* CRT Effects */
-        body::after {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(238, 180, 59, 0.03) 2px);
-            pointer-events: none; z-index: 10001;
-        }
-
         #loader { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--summa-black); z-index: 10000; }
         #app { display: none; width: 100%; height: 100dvh; max-width: 450px; margin: 0 auto; background: var(--summa-grey); flex-direction: column; }
 
         .logo-bar { background: var(--summa-black); padding: 20px 10px; text-align: center; border-bottom: 1px solid var(--summa-gold); flex-shrink: 0; }
-        .logo-img { max-width: 220px; width: 70%; height: auto; }
+        .logo-img { max-width: 200px; width: 60%; height: auto; }
         
         #menu-list { background: #000; flex-grow: 1; overflow-y: auto; margin: 0 5px; border: 1px solid #222; -webkit-overflow-scrolling: touch; }
 
-        .category-btn { width: 100%; padding: 18px; background: var(--summa-grey); color: var(--summa-gold); text-align: left; border: none; border-bottom: 1px solid #222; font-weight: bold; display: flex; justify-content: space-between; }
+        .category-btn { width: 100%; padding: 18px; background: var(--summa-grey); color: var(--summa-gold); text-align: left; border: none; border-bottom: 1px solid #222; font-weight: bold; display: flex; justify-content: space-between; font-family: inherit; }
         .category-content { display: none; }
         
-        .item-row { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #111; cursor: pointer; }
-        .item-info { flex-grow: 1; margin-left: 10px; }
+        .item-row { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #111; }
+        .item-info { flex-grow: 1; margin-left: 10px; cursor: pointer; }
         
-        .order-check { appearance: none; width: 22px; height: 22px; border: 1px solid var(--summa-gold); border-radius: 3px; position: relative; flex-shrink: 0; z-index: 2; }
-        .order-check:checked { background: var(--summa-gold); box-shadow: 0 0 10px var(--summa-gold); }
+        .order-check { appearance: none; width: 24px; height: 24px; border: 1px solid var(--summa-gold); border-radius: 3px; flex-shrink: 0; cursor: pointer; }
+        .order-check:checked { background: var(--summa-gold); }
 
-        /* DETAIL PANEL */
         #detail-overlay {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95);
             z-index: 5000; justify-content: center; align-items: center; padding: 20px;
         }
         .detail-box {
             background: var(--summa-grey); border: 1px solid var(--summa-gold);
-            width: 100%; max-width: 320px; padding: 20px; border-radius: 4px;
-            box-shadow: 0 0 30px var(--summa-gold-glow);
+            width: 90%; max-width: 320px; padding: 20px; border-radius: 4px;
         }
-        .detail-label { color: var(--summa-gold); font-size: 9px; text-transform: uppercase; margin-top: 12px; letter-spacing: 1px; }
-        .detail-val { color: #fff; font-size: 15px; margin-bottom: 4px; border-bottom: 1px solid #333; padding-bottom: 2px; word-break: break-all; }
+        .detail-label { color: var(--summa-gold); font-size: 10px; text-transform: uppercase; margin-top: 12px; }
+        .detail-val { color: #fff; font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 2px; margin-bottom: 4px; word-break: break-all; }
 
-        .footer { padding: 10px 20px; padding-bottom: calc(15px + env(safe-area-inset-bottom)); background: var(--summa-black); border-top: 1px solid var(--summa-gold); flex-shrink: 0; }
-        .order-btn { width: 100%; padding: 16px; background: var(--summa-gold); color: #000; border: none; border-radius: 4px; font-weight: 900; text-transform: uppercase; }
-        #count-badge { background: #000; color: var(--summa-gold); padding: 2px 6px; border-radius: 10px; font-size: 10px; margin-left: 5px; border: 1px solid var(--summa-gold); }
+        .footer { padding: 15px; background: var(--summa-black); border-top: 1px solid var(--summa-gold); flex-shrink: 0; }
+        .order-btn { width: 100%; padding: 16px; background: var(--summa-gold); color: #000; border: none; border-radius: 4px; font-weight: 900; font-family: inherit; }
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <div style="color: var(--summa-gold); font-size: 12px; letter-spacing: 4px;">SYNCING METRC DATA...</div>
+        <div style="color: var(--summa-gold); font-size: 12px; letter-spacing: 2px;">RE-INITIALIZING SYSTEM...</div>
     </div>
 
     <div id="detail-overlay" onclick="closeDetail()">
         <div class="detail-box" onclick="event.stopPropagation()">
-            <div id="det-strain" style="color:var(--summa-gold); font-weight:bold; font-size:18px; margin-bottom:15px; border-bottom: 1px solid var(--summa-gold); padding-bottom:5px;">STRAIN_NAME</div>
-            
-            <div class="detail-label">METRC ID</div>
-            <div id="det-metrc" class="detail-val">--</div>
-
-            <div class="detail-label">Lot Number</div>
-            <div id="det-lot" class="detail-val">--</div>
-
-            <div style="display: flex; gap: 20px;">
-                <div style="flex: 1;">
-                    <div class="detail-label">Harvest Date</div>
-                    <div id="det-harvest" class="detail-val">--</div>
-                </div>
-                <div style="flex: 1;">
-                    <div class="detail-label">Available Qty</div>
-                    <div id="det-qty" class="detail-val">--</div>
-                </div>
-            </div>
-
-            <div class="detail-label">Potency (THC)</div>
-            <div id="det-thc" class="detail-val">0%</div>
-
-            <button onclick="closeDetail()" style="width:100%; margin-top:20px; padding:12px; background:transparent; border:1px solid #444; color:#888; font-family:monospace; cursor:pointer;">RETURN TO TERMINAL</button>
+            <div id="det-strain" style="color:var(--summa-gold); font-weight:bold; font-size:18px; border-bottom: 1px solid var(--summa-gold); padding-bottom:10px; margin-bottom:10px;">NAME</div>
+            <div class="detail-label">METRC ID</div><div id="det-metrc" class="detail-val">--</div>
+            <div class="detail-label">LOT NUMBER</div><div id="det-lot" class="detail-val">--</div>
+            <div class="detail-label">HARVEST DATE</div><div id="det-harvest" class="detail-val">--</div>
+            <div class="detail-label">QUANTITY</div><div id="det-qty" class="detail-val">--</div>
+            <div class="detail-label">THC %</div><div id="det-thc" class="detail-val">--</div>
+            <button onclick="closeDetail()" style="width:100%; margin-top:20px; padding:12px; background:#333; color:#fff; border:none; font-family:inherit;">CLOSE</button>
         </div>
     </div>
 
     <div id="app">
         <div class="logo-bar">
             <img src="summa.webp" alt="SUMMA" class="logo-img">
-            <div style="font-size:8px; color:rgba(238,180,59,0.5); margin-top:5px; letter-spacing: 2px;">702WISH x METRC COMPLIANCE V2.1</div>
+            <div style="font-size:8px; color:var(--summa-gold); margin-top:5px; opacity:0.6;">702WISH SECURE TERMINAL V2.2</div>
         </div>
         <div id="menu-list"></div>
         <div class="footer">
-            <button class="order-btn" onclick="sendEmail()">
-                REQUEST AVAILABILITY <span id="count-badge" style="display:none">0</span>
-            </button>
+            <button class="order-btn" onclick="sendEmail()">SEND INQUIRY <span id="count-badge" style="display:none">0</span></button>
         </div>
     </div>
 
     <script>
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playBeep(f, d) {
-            const osc = audioCtx.createOscillator(); const g = audioCtx.createGain();
-            osc.frequency.value = f; g.gain.value = 0.05;
-            osc.connect(g); g.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + d);
+        function beep() {
+            const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+            o.frequency.value = 600; g.gain.value = 0.02; o.connect(g); g.connect(audioCtx.destination);
+            o.start(); o.stop(audioCtx.currentTime + 0.05);
         }
 
         function showDetail(strain, metrc, lot, harvest, qty, thc) {
-            playBeep(600, 0.05);
             document.getElementById('det-strain').innerText = strain;
-            document.getElementById('det-metrc').innerText = metrc || 'NOT LISTED';
-            document.getElementById('det-lot').innerText = lot || 'PENDING';
+            document.getElementById('det-metrc').innerText = metrc || 'N/A';
+            document.getElementById('det-lot').innerText = lot || 'N/A';
             document.getElementById('det-harvest').innerText = harvest || 'N/A';
-            document.getElementById('det-qty').innerText = qty || 'INQUIRE';
-            document.getElementById('det-thc').innerText = thc + '%';
+            document.getElementById('det-qty').innerText = qty || 'N/A';
+            document.getElementById('det-thc').innerText = thc || 'N/A';
             document.getElementById('detail-overlay').style.display = 'flex';
         }
 
         function closeDetail() { document.getElementById('detail-overlay').style.display = 'none'; }
 
-        function updateCounter() {
-            const count = document.querySelectorAll('.order-check:checked').length;
-            const badge = document.getElementById('count-badge');
-            badge.innerText = count;
-            badge.style.display = count > 0 ? 'inline-block' : 'none';
-        }
-
-        window.onload = async () => {
+        async function loadMenu() {
             try {
                 const resp = await fetch('menu.xlsx');
                 const buf = await resp.arrayBuffer();
@@ -146,7 +108,7 @@
 
                 wb.SheetNames.forEach((name, idx) => {
                     const rows = XLSX.utils.sheet_to_json(wb.Sheets[name], {header: 1});
-                    if (rows.length === 0) return;
+                    if (rows.length < 2) return;
 
                     const btn = document.createElement('button');
                     btn.className = "category-btn";
@@ -160,47 +122,55 @@
                     const cont = document.createElement('div');
                     cont.id = 'cat-'+idx; cont.className = 'category-content';
                     
-                    const h = rows[0].map(val => String(val).trim());
-                    const findCol = (targets) => h.findIndex(col => targets.some(t => col.includes(t)));
+                    // IMPROVED COLUMN FINDER
+                    const headers = rows[0].map(h => String(h).toLowerCase());
+                    const f = (keys) => headers.findIndex(h => keys.some(k => h.includes(k.toLowerCase())));
 
-                    const sIdx = findCol(['Strain']);
-                    const tIdx = findCol(['THC']);
-                    const hIdx = findCol(['Harvest']);
-                    const qIdx = findCol(['Quantity', 'Qty']);
-                    const lIdx = findCol(['Lot', 'Lot #', 'Lot*']); // Asterisk safe
-                    const mIdx = findCol(['METRC', 'Metrc']);
+                    const sI = f(['Strain']);
+                    const tI = f(['THC']);
+                    const hI = f(['Harvest']);
+                    const qI = f(['Quant', 'Qty']);
+                    const lI = f(['Lot']); 
+                    const mI = f(['Metrc']);
 
                     rows.slice(1).forEach(r => {
-                        if(!r[sIdx]) return;
+                        if (!r[sI]) return;
                         const row = document.createElement('div');
                         row.className = 'item-row';
                         row.innerHTML = `
-                            <input type="checkbox" class="order-check" data-strain="${r[sIdx]}">
-                            <div class="item-info" onclick="showDetail('${r[sIdx]}', '${r[mIdx]||''}', '${r[lIdx]||''}', '${r[hIdx]||''}', '${r[qIdx]||''}', '${r[tIdx]||''}')">
-                                <div style="font-weight:bold; color:#fff;">${r[sIdx]}</div>
-                                <div style="font-size:10px; color:var(--summa-gold);">THC: ${r[tIdx]}% | CLICK FOR DETAILS</div>
+                            <input type="checkbox" class="order-check" data-strain="${r[sI]}">
+                            <div class="item-info">
+                                <div style="font-weight:bold; color:#fff;">${r[sI]}</div>
+                                <div style="font-size:10px; color:var(--summa-gold);">THC: ${r[tI] || '??'}% | VIEW DETAILS</div>
                             </div>
                         `;
-                        row.querySelector('.order-check').onclick = (e) => { e.stopPropagation(); updateCounter(); };
+                        // Clicks on text open details
+                        row.querySelector('.item-info').onclick = () => showDetail(r[sI], r[mI], r[lI], r[hI], r[qI], r[tI]);
+                        // Clicks on checkbox update count
+                        row.querySelector('.order-check').onchange = () => {
+                            beep();
+                            const count = document.querySelectorAll('.order-check:checked').length;
+                            document.getElementById('count-badge').innerText = `(${count})`;
+                            document.getElementById('count-badge').style.display = count > 0 ? 'inline' : 'none';
+                        };
                         cont.appendChild(row);
                     });
                     list.appendChild(cont);
                 });
-            } catch (e) { console.error("Excel Error:", e); }
-
-            setTimeout(() => { 
-                document.getElementById('loader').style.display='none'; 
-                document.getElementById('app').style.display='flex'; 
-            }, 1500);
-        };
+            } catch (err) { alert("Excel Load Error. Check file name 'menu.xlsx'"); }
+            document.getElementById('loader').style.display='none'; 
+            document.getElementById('app').style.display='flex';
+        }
 
         function sendEmail() {
             const checks = document.querySelectorAll('.order-check:checked');
             if (checks.length === 0) return;
-            let body = "Summa Wholesale Availability Request:%0A%0A";
+            let body = "Summa Wholesale Request:%0A%0A";
             checks.forEach(c => body += `- ${c.dataset.strain}%0A`);
             window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Request&body=${body}`;
         }
+
+        loadMenu();
     </script>
 </body>
 </html>
