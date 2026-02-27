@@ -10,10 +10,12 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: #d1d1d1; font-family: 'Courier New', monospace; margin: 0; padding: 0; height: 100dvh; overflow: hidden; }
         
-        /* LEAF LOADER */
         #loader { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--bg); z-index: 10000; color: var(--gold); }
+        
+        /* AUTHENTIC CANNABIS LEAF SVG */
         .leaf-svg { width: 100px; height: 100px; fill: var(--gold); filter: drop-shadow(0 0 15px var(--gold)); animation: pulse 2s ease-in-out infinite; margin-bottom: 25px; }
         @keyframes pulse { 0%, 100% { transform: scale(0.9); opacity: 0.3; } 50% { transform: scale(1.1); opacity: 1; } }
+        
         .loading-text { font-size: 12px; letter-spacing: 5px; text-transform: uppercase; font-weight: bold; }
 
         #app { display: none; width: 100%; height: 100dvh; max-width: 450px; margin: 0 auto; background: var(--card); flex-direction: column; }
@@ -21,19 +23,17 @@
         .logo-img { max-width: 200px; width: 65%; }
         
         #menu-list { background: #000; flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-        
-        /* MULTI-TABLE HEADERS */
         .cat-header { background: #111; color: var(--gold); padding: 22px; font-weight: 900; border-bottom: 1px solid #222; cursor: pointer; display: flex; justify-content: space-between; font-size: 16px; text-transform: uppercase; }
-        .sub-section-title { background: var(--sub); color: #fff; padding: 10px 15px; font-size: 11px; font-weight: bold; border-bottom: 1px solid #444; text-transform: uppercase; letter-spacing: 1px; }
+        .sub-section-title { background: var(--sub); color: #fff; padding: 10px 15px; font-size: 11px; font-weight: bold; border-bottom: 1px solid #444; text-transform: uppercase; }
         .cat-box { display: none; background: #050505; }
 
         .row { display: flex; align-items: center; padding: 18px 15px; border-bottom: 1px solid #111; width: 100%; }
         .info { flex-grow: 1; margin-left: 15px; cursor: pointer; }
-        .check { width: 30px; height: 30px; border: 2px solid var(--gold); appearance: none; cursor: pointer; flex-shrink: 0; border-radius: 4px; background: transparent; transition: 0.2s; }
-        .check:checked { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+        .check { width: 30px; height: 30px; border: 2px solid var(--gold); appearance: none; cursor: pointer; flex-shrink: 0; border-radius: 4px; }
+        .check:checked { background: var(--gold); }
 
         #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 11000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-box { background: #1a1a1a; border: 1px solid var(--gold); width: 100%; max-width: 350px; padding: 25px; border-radius: 4px; box-shadow: 0 0 40px rgba(0,0,0,1); }
+        .modal-box { background: #1a1a1a; border: 1px solid var(--gold); width: 100%; max-width: 350px; padding: 25px; border-radius: 4px; }
         .label { color: var(--gold); font-size: 9px; margin-top: 14px; font-weight: bold; text-transform: uppercase; }
         .val { color: #fff; font-size: 15px; border-bottom: 1px solid #333; padding-bottom: 4px; margin-bottom: 2px; }
 
@@ -44,7 +44,9 @@
 <body>
 
     <div id="loader">
-        <svg class="leaf-svg" viewBox="0 0 24 24"><path d="M12,16C12,16 11,13 8,11.5C5,10 3,11 3,11C3,11 4,8 7,7C10,6 12,10 12,10C12,10 14,6 17,7C20,8 21,11 21,11C21,11 19,10 16,11.5C13,13 12,16 12,16M12,21C12,21 11,18 9,17C7,16 4,16 4,16C4,16 7,15 8,13C9,11 10,13 10,13C10,13 11,10 12,10C13,10 14,13 14,13C14,13 15,11 16,13C17,15 20,16 20,16C20,16 17,16 15,17C13,18 12,21 12,21M12,2C12,2 11,5 11,8C11,11 12,11 12,11C12,11 13,11 13,8C13,5 12,2 12,2Z"/></svg>
+        <svg class="leaf-svg" viewBox="0 0 512 512">
+            <path d="M495.9,235.3c-23.7-29.2-80.5-62.2-121.2-67.9c32.4-38,62.8-86.3,64.2-89c5-9.1,1.7-20.5-7.4-25.5c-9.1-5-20.5-1.7-25.5,7.4 c-0.6,1-27.1,46.1-56.5,82.4c-0.2-31.5,1.2-84.3,1.2-84.3c0.4-10.4-7.7-19-18.1-19.4c-10.4-0.4-19,7.7-19.4,18.1 c-0.1,1.9-0.8,31.7-1.1,70.6c-28-36.9-63.5-73-63.5-73c-7.3-7.5-19.2-7.7-26.6-0.3c-7.5,7.3-7.7,19.2-0.3,26.6 c0.3,0.3,31,31.6,56.6,62.4c-41.2,2.3-95.2,16.5-131.7,39.9c-8.9,5.7-11.5,17.5-5.8,26.4c5.7,8.9,17.5,11.5,26.4,5.8 c30.6-19.6,77.5-31.8,113.3-33.8c-23.6,33.1-47.5,84.4-48.5,87.6c-3.1,10,2.6,20.6,12.6,23.7s20.6-2.6,23.7-12.6 c0.4-1.2,19.7-47.3,39.3-81.6c17.5,23.1,38.9,64.5,38.9,64.5c4.7,9.3,16.1,13.1,25.4,8.3s13.1-16.1,8.3-25.4 c-0.4-0.8-17.2-31.7-32-55.6c43.4,8.9,89.5,41.9,112.9,69.5c6.5,7.7,18.1,8.6,25.7,2.1C500.5,260.6,501.4,249,494.9,241.4 C495.2,241.1,495.6,238.2,495.9,235.3z M167.3,367.6l-37.1-71.1l-71.1-37.1l71.1-37.1l37.1-71.1l37.1,71.1l71.1,37.1l-71.1,37.1 L167.3,367.6z"/>
+        </svg>
         <div class="loading-text" id="status">INITIALIZING CANNABIS...</div>
     </div>
 
@@ -70,20 +72,18 @@
     </div>
 
     <script>
-        // SOUND ENGINE
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSfx(freq, type, dur) {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = type; osc.frequency.setValueAtTime(freq, ctx.currentTime);
-            gain.gain.setValueAtTime(0.1, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + dur);
-            osc.connect(gain); gain.connect(ctx.destination);
-            osc.start(); osc.stop(ctx.currentTime + dur);
+        function playSfx(f, t, d, g=0.1) {
+            const o = ctx.createOscillator(); const v = ctx.createGain();
+            o.type = t; o.frequency.setValueAtTime(f, ctx.currentTime);
+            v.gain.setValueAtTime(g, ctx.currentTime);
+            v.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + d);
+            o.connect(v); v.connect(ctx.destination);
+            o.start(); o.stop(ctx.currentTime + d);
         }
 
         function toggle(id) {
-            playSfx(150, 'square', 0.1);
+            playSfx(150, 'sine', 0.1, 0.05);
             const el = document.getElementById(id);
             const open = el.style.display === 'block';
             document.querySelectorAll('.cat-box').forEach(c => c.style.display = 'none');
@@ -91,7 +91,7 @@
         }
 
         function pop(s, m, l, h, q, t, p) {
-            playSfx(600, 'sine', 0.2);
+            playSfx(400, 'sine', 0.1, 0.05);
             document.getElementById('m-strain').innerText = s;
             document.getElementById('m-metrc').innerText = m || 'N/A';
             document.getElementById('m-lot').innerText = l || 'N/A';
@@ -103,7 +103,6 @@
         }
 
         async function start() {
-            setTimeout(() => playSfx(100, 'sawtooth', 1.5), 500); // Initial "hiss"
             try {
                 const response = await fetch('menu.xlsx?v=' + Date.now());
                 const arrayBuffer = await response.arrayBuffer();
@@ -124,28 +123,17 @@
                     const cDiv = document.createElement('div');
                     cDiv.id = cId; cDiv.className = 'cat-box';
 
-                    let currentIdx = { s:-1, t:-1, h:-1, q:-1, l:-1, m:-1, p:-1 };
+                    let idx = { s:-1, t:-1, h:-1, q:-1, l:-1, m:-1, p:-1 };
 
                     data.forEach((row) => {
-                        const firstCell = String(row[0] || "").toLowerCase();
-                        
-                        // Detect New Header Row (Strain, Lot, etc.)
-                        if(firstCell.includes('strain')) {
-                            const heads = row.map(h => String(h || "").toLowerCase().replace(/[#*_\s%]/g, ''));
-                            currentIdx = {
-                                s: heads.findIndex(h => h === 'strain'),
-                                t: heads.findIndex(h => h.includes('thc')),
-                                h: heads.findIndex(h => h.includes('harvest')),
-                                q: heads.findIndex(h => h.includes('weight')),
-                                l: heads.findIndex(h => h === 'lot'),
-                                m: heads.findIndex(h => h.includes('metrc')),
-                                p: heads.findIndex(h => h === 'price')
-                            };
+                        const cell0 = String(row[0] || "").toLowerCase();
+                        if(cell0.includes('strain')) {
+                            const h = row.map(v => String(v || "").toLowerCase().replace(/[#*_\s%]/g, ''));
+                            idx = { s:h.indexOf('strain'), t:h.findIndex(x=>x.includes('thc')), h:h.findIndex(x=>x.includes('harvest')), q:h.findIndex(x=>x.includes('weight')), l:h.indexOf('lot'), m:h.findIndex(x=>x.includes('metrc')), p:h.indexOf('price') };
                             return;
                         }
 
-                        // Detect Sub-Category Header (e.g., Chubbies row)
-                        if (row[0] && currentIdx.s === -1 || (row[0] && !row[1] && !row[2])) {
+                        if (row[0] && !row[1] && !row[2]) {
                             const sub = document.createElement('div');
                             sub.className = 'sub-section-title';
                             sub.innerText = row[0];
@@ -153,21 +141,19 @@
                             return;
                         }
 
-                        // Product Row
-                        if(row[currentIdx.s] && currentIdx.s !== -1) {
-                            const strain = row[currentIdx.s];
-                            if(strain.toLowerCase() === 'strain') return;
-                            
+                        if(row[idx.s] && idx.s !== -1 && row[idx.s].toLowerCase() !== 'strain') {
                             const item = document.createElement('div');
                             item.className = 'row';
+                            const d = { s:row[idx.s], m:row[idx.m], l:row[idx.l], h:row[idx.h], q:row[idx.q], t:row[idx.t], p:row[idx.p] };
                             item.innerHTML = `
-                                <input type="checkbox" class="check" data-name="${strain}">
+                                <input type="checkbox" class="check" 
+                                    data-full='{"Strain":"${d.s}","Lot":"${d.l||'NA'}","THC":"${d.t||'NA'}","Weight":"${d.q||'NA'}","Price":"${d.p||'NA'}"}'>
                                 <div class="info">
-                                    <div style="font-weight:bold; color:white; font-size:16px;">${strain}</div>
-                                    <div style="font-size:11px; color:var(--gold); margin-top:4px;">THC: ${row[currentIdx.t]||'--'}% | ${row[currentIdx.p]||'INQUIRE'}</div>
+                                    <div style="font-weight:bold; color:white; font-size:16px;">${d.s}</div>
+                                    <div style="font-size:11px; color:var(--gold); margin-top:4px;">THC: ${d.t||'--'}% | ${d.p||'INQUIRE'}</div>
                                 </div>
                             `;
-                            item.querySelector('.info').onclick = () => pop(strain, row[currentIdx.m], row[currentIdx.l], row[currentIdx.h], row[currentIdx.q], row[currentIdx.t], row[currentIdx.p]);
+                            item.querySelector('.info').onclick = () => pop(d.s, d.m, d.l, d.h, d.q, d.t, d.p);
                             cDiv.appendChild(item);
                         }
                     });
@@ -175,6 +161,7 @@
                 });
 
                 setTimeout(() => {
+                    playSfx(80, 'sine', 0.5, 0.2); // Subtle load-complete thud
                     document.getElementById('loader').style.display = 'none';
                     document.getElementById('app').style.display = 'flex';
                 }, 3000);
@@ -183,9 +170,18 @@
         }
 
         function send() {
-            const sel = Array.from(document.querySelectorAll('.check:checked')).map(c => c.dataset.name);
-            if(sel.length === 0) return;
-            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Request&body=Requesting Inquiry For:%0A%0A- ${sel.join('%0A- ')}`;
+            const checks = Array.from(document.querySelectorAll('.check:checked'));
+            if(checks.length === 0) return;
+            
+            let body = "REQUESTING WHOLESALE QUOTE FOR:%0A%0A";
+            checks.forEach(c => {
+                const data = JSON.parse(c.getAttribute('data-full'));
+                body += `• ${data.Strain.toUpperCase()}%0A`;
+                body += `  Lot: ${data.Lot} | THC: ${data.THC}%25%0A`;
+                body += `  Weight: ${data.Weight} | Price: ${data.Price}%0A%0A`;
+            });
+
+            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Inquiry (${checks.length} Items)&body=${body}`;
         }
 
         window.addEventListener('load', start);
