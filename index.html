@@ -43,21 +43,6 @@
         <div class="loading-text">INITIALIZING SUMMA_OS</div>
     </div>
 
-    <div id="modal" onclick="closeModal()">
-        <div class="modal-box" id="modal-box" onclick="event.stopPropagation()">
-            <div id="m-strain" style="color:var(--gold); font-weight:bold; font-size:24px; border-bottom: 2px solid var(--gold); padding-bottom:10px; margin-bottom:20px; text-transform:uppercase;">--</div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div><div class="label">METRC_ID</div><div id="m-metrc" class="val">--</div></div>
-                <div><div class="label">LOT_NUM</div><div id="m-lot" class="val">--</div></div>
-                <div><div class="label">HARVEST_DT</div><div id="m-harvest" class="val">--</div></div>
-                <div><div class="label">CUR_WEIGHT</div><div id="m-qty" class="val">--</div></div>
-                <div><div class="label">THC_CONTENT</div><div id="m-thc" class="val" style="color:#0f0; font-weight:bold;">--</div></div>
-                <div><div class="label">EST_PRICE</div><div id="m-price" class="val" style="color:var(--gold); font-weight:bold;">--</div></div>
-            </div>
-            <button onclick="closeModal()" style="width:100%; margin-top:30px; padding:15px; background:#111; color:#fff; border:1px solid #444; font-family:inherit; cursor:pointer;">CLOSE_NODE</button>
-        </div>
-    </div>
-
     <div id="app">
         <div class="logo-bar">
             <span class="creator-tag">DEV_ID: @702WISH</span>
@@ -89,29 +74,15 @@
             el.style.display = open ? 'none' : 'block';
         }
 
-        function clearCart() {
-            document.querySelectorAll('.check').forEach(c => c.checked = false);
-            updateCount();
-        }
-
         function updateCount() {
             const n = document.querySelectorAll('.check:checked').length;
             document.getElementById('count').innerText = n > 0 ? `[${n}]` : "";
         }
 
-        function pop(s, m, l, h, q, t, p) {
-            playSfx(450, 'sine', 0.1);
-            document.getElementById('m-strain').innerText = s;
-            document.getElementById('m-metrc').innerText = m || '---';
-            document.getElementById('m-lot').innerText = l || '---';
-            document.getElementById('m-harvest').innerText = h || '---';
-            document.getElementById('m-qty').innerText = q || '---';
-            document.getElementById('m-thc').innerText = t || '--';
-            document.getElementById('m-price').innerText = p || 'TBD';
-            document.getElementById('modal').style.display = 'flex';
+        function clearCart() {
+            document.querySelectorAll('.check').forEach(c => c.checked = false);
+            updateCount();
         }
-        
-        function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
         async function start() {
             try {
@@ -142,7 +113,7 @@
                         const cell0 = String(row[0] || "").toLowerCase();
                         if(cell0.includes('strain')) {
                             const h = row.map(v => String(v || "").toLowerCase().replace(/[#*_\s%]/g, ''));
-                            idx = { s:h.indexOf('strain'), t:h.findIndex(x=>x.includes('thc')), h:h.findIndex(x=>x.includes('harvest')), q:h.findIndex(x=>x.includes('weight')), l:h.indexOf('lot'), m:h.findIndex(x=>x.includes('metrc')), p:h.indexOf('price') };
+                            idx = { s:h.indexOf('strain'), t:h.findIndex(x=>x.includes('thc')), l:h.indexOf('lot'), q:h.findIndex(x=>x.includes('weight')), p:h.indexOf('price') };
                             return;
                         }
                         if (row[0] && !row[1] && !row[2]) {
@@ -156,19 +127,26 @@
                         if(row[idx.s] && idx.s !== -1 && row[idx.s].toLowerCase() !== 'strain') {
                             const item = document.createElement('div');
                             item.className = 'row';
-                            const d = { s:row[idx.s], m:row[idx.m], l:row[idx.l], h:row[idx.h], q:row[idx.q], t:row[idx.t], p:row[idx.p] };
+                            const strainName = String(row[idx.s]);
                             
-                            // CLEAN DATA FOR JSON
-                            const cleanJson = JSON.stringify({
-                                s: d.s, l: d.l||'N/A', t: d.t||'N/A', q: d.q||'N/A', p: d.p||'N/A', 
-                                cat: sName, sub: currentSub
-                            }).replace(/'/g, "&#39;");
+                            // Direct attribute storage to avoid JSON mangling
+                            const checkbox = document.createElement('input');
+                            checkbox.type = 'checkbox';
+                            checkbox.className = 'check';
+                            checkbox.onchange = updateCount;
+                            checkbox.dataset.strain = strainName;
+                            checkbox.dataset.cat = sName;
+                            checkbox.dataset.sub = currentSub;
+                            checkbox.dataset.lot = row[idx.l] || 'N/A';
+                            checkbox.dataset.thc = row[idx.t] || 'N/A';
+                            checkbox.dataset.qty = row[idx.q] || 'N/A';
+                            checkbox.dataset.price = row[idx.p] || 'N/A';
 
-                            item.innerHTML = `
-                                <input type="checkbox" class="check" onchange="updateCount()" data-payload='${cleanJson}'>
-                                <div class="info" style="flex-grow:1; margin-left:15px; cursor:pointer;" onclick="pop('${d.s.replace(/'/g, "")}','${d.m}','${d.l}','${d.h}','${d.q}','${d.t}','${d.p}')">
-                                    <div style="font-weight:bold; color:white; font-size:16px;">${d.s}</div>
-                                    <div style="font-size:10px; color:var(--gold); margin-top:5px;">THC:${d.t||'--'}% | PRC:${d.p||'---'}</div>
+                            item.appendChild(checkbox);
+                            item.innerHTML += `
+                                <div class="info" style="flex-grow:1; margin-left:15px;">
+                                    <div style="font-weight:bold; color:white; font-size:16px;">${strainName}</div>
+                                    <div style="font-size:10px; color:var(--gold); margin-top:5px;">THC:${row[idx.t]||'--'}% | PRICE:${row[idx.p]||'--'}</div>
                                 </div>
                             `;
                             cDiv.appendChild(item);
@@ -186,31 +164,48 @@
             if(checks.length === 0) return;
             playSfx(900, 'sine', 0.2);
             
+            // Build the data structure manually
             const structure = {};
             checks.forEach(c => {
-                const data = JSON.parse(c.getAttribute('data-payload'));
-                if(!structure[data.cat]) structure[data.cat] = {};
-                if(!structure[data.cat][data.sub]) structure[data.cat][data.sub] = [];
-                structure[data.cat][data.sub].push(data);
+                const cat = c.dataset.cat;
+                const sub = c.dataset.sub;
+                if(!structure[cat]) structure[cat] = {};
+                if(!structure[cat][sub]) structure[cat][sub] = [];
+                
+                structure[cat][sub].push({
+                    strain: c.dataset.strain,
+                    lot: c.dataset.lot,
+                    thc: c.dataset.thc,
+                    qty: c.dataset.qty,
+                    price: c.dataset.price
+                });
             });
 
-            let body = "--- SUMMA_WHOLESALE_ORDER ---%0A%0A";
-            for (const [cat, subs] of Object.entries(structure)) {
-                body += `>> CATEGORY: ${cat.toUpperCase()}%0A`;
-                body += `=================================%0A`;
-                for (const [sub, items] of Object.entries(subs)) {
-                    body += `[TYPE]: ${sub.toUpperCase()}%0A`;
-                    body += `---------------------------------%0A`;
-                    items.forEach(i => {
-                        body += `* ITEM: ${i.s.toUpperCase()}%0A`;
-                        body += `  LOT: ${i.l} | THC: ${i.t}%25%0A`;
-                        body += `  QTY: ${i.q} | PRICE: ${i.p}%0A%0A`;
+            let body = "--- SUMMA_WHOLESALE_ORDER_MANIFEST ---%0A%0A";
+            
+            for (const [catName, subCats] of Object.entries(structure)) {
+                body += `>>> CATEGORY: ${catName.toUpperCase()}%0A`;
+                body += `====================================%0A`;
+                
+                for (const [subName, items] of Object.entries(subCats)) {
+                    body += `[TYPE]: ${subName.toUpperCase()}%0A`;
+                    body += `------------------------------------%0A`;
+                    
+                    items.forEach(item => {
+                        body += `* ${item.strain.toUpperCase()}%0A`;
+                        body += `  LOT: ${item.lot} | THC: ${item.thc}%25%0A`;
+                        body += `  WEIGHT: ${item.qty} | PRICE: ${item.price}%0A%0A`;
                     });
                 }
                 body += `%0A`;
             }
+
+            const now = new Date();
+            body += `------------------------------------%0A`;
+            body += `MANIFEST_GENERATED: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}%0A`;
+            body += `SYSTEM_ID: @702WISH_V4%0A`;
             
-            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Summa Wholesale Inquiry&body=${body}`;
+            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Summa Wholesale Order&body=${body}`;
         }
 
         window.addEventListener('load', start);
