@@ -12,16 +12,14 @@
         #loader { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--summa-black); z-index: 10000; }
         #app { display: none; width: 100%; height: 100dvh; max-width: 450px; margin: 0 auto; background: var(--summa-grey); flex-direction: column; }
 
-        /* SEARCH BAR */
         .search-container { padding: 10px; background: #000; border-bottom: 1px solid #333; }
-        #strain-search { width: 100%; padding: 12px; background: #111; border: 1px solid var(--summa-gold); color: var(--summa-gold); font-family: inherit; box-sizing: border-box; border-radius: 4px; }
+        #strain-search { width: 100%; padding: 12px; background: #111; border: 1px solid var(--summa-gold); color: var(--summa-gold); font-family: inherit; box-sizing: border-box; border-radius: 4px; outline: none; }
 
         .logo-bar { background: var(--summa-black); padding: 15px 10px; text-align: center; border-bottom: 1px solid var(--summa-gold); flex-shrink: 0; }
         .logo-img { max-width: 180px; width: 50%; height: auto; }
         
         #menu-list { background: #000; flex-grow: 1; overflow-y: auto; margin: 0 5px; border: 1px solid #222; -webkit-overflow-scrolling: touch; }
-        .category-btn { width: 100%; padding: 18px; background: var(--summa-grey); color: var(--summa-gold); text-align: left; border: none; border-bottom: 1px solid #222; font-weight: bold; display: flex; justify-content: space-between; font-family: inherit; }
-        .category-content { display: block; } /* Defaulting to block for search visibility */
+        .category-btn { width: 100%; padding: 18px; background: var(--summa-grey); color: var(--summa-gold); text-align: left; border: none; border-bottom: 1px solid #222; font-weight: bold; font-family: inherit; }
         
         .item-row { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #111; }
         .item-info { flex-grow: 1; margin-left: 10px; cursor: pointer; }
@@ -29,23 +27,19 @@
         .order-check:checked { background: var(--summa-gold); }
 
         #detail-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; justify-content: center; align-items: center; padding: 20px; }
-        .detail-box { background: var(--summa-grey); border: 1px solid var(--summa-gold); width: 90%; max-width: 320px; padding: 20px; border-radius: 4px; }
+        .detail-box { background: var(--summa-grey); border: 1px solid var(--summa-gold); width: 90%; max-width: 320px; padding: 20px; border-radius: 4px; box-shadow: 0 0 20px rgba(238, 180, 59, 0.2); }
         .detail-label { color: var(--summa-gold); font-size: 10px; text-transform: uppercase; margin-top: 10px; }
-        .detail-val { color: #fff; font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 2px; margin-bottom: 4px; }
-
-        #error-log { display: none; padding: 20px; color: #ff4444; font-size: 12px; background: #000; border: 1px solid #ff4444; margin: 10px; position: absolute; bottom: 0; z-index: 10001; }
+        .detail-val { color: #fff; font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 2px; margin-bottom: 4px; overflow-wrap: break-word; }
 
         .footer { padding: 15px; background: var(--summa-black); border-top: 1px solid var(--summa-gold); flex-shrink: 0; }
-        .order-btn { width: 100%; padding: 16px; background: var(--summa-gold); color: #000; border: none; border-radius: 4px; font-weight: 900; font-family: inherit; }
+        .order-btn { width: 100%; padding: 16px; background: var(--summa-gold); color: #000; border: none; border-radius: 4px; font-weight: 900; font-family: inherit; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <div style="color: var(--summa-gold); font-size: 12px; letter-spacing: 2px;">LOADING DATA...</div>
+        <div style="color: var(--summa-gold); font-size: 12px; letter-spacing: 2px;">REPAIRING LINK...</div>
     </div>
-
-    <div id="error-log"></div>
 
     <div id="detail-overlay" onclick="closeDetail()">
         <div class="detail-box" onclick="event.stopPropagation()">
@@ -55,19 +49,15 @@
             <div class="detail-label">HARVEST DATE</div><div id="det-harvest" class="detail-val">--</div>
             <div class="detail-label">QUANTITY</div><div id="det-qty" class="detail-val">--</div>
             <div class="detail-label">THC %</div><div id="det-thc" class="detail-val">--</div>
-            <button onclick="closeDetail()" style="width:100%; margin-top:20px; padding:12px; background:#333; color:#fff; border:none; font-family:inherit;">CLOSE</button>
+            <button onclick="closeDetail()" style="width:100%; margin-top:20px; padding:12px; background:#333; color:#fff; border:none; font-family:inherit; cursor:pointer;">BACK</button>
         </div>
     </div>
 
     <div id="app">
-        <div class="logo-bar">
-            <img src="summa.webp" alt="SUMMA" class="logo-img">
-        </div>
-        
+        <div class="logo-bar"><img src="summa.webp" alt="SUMMA" class="logo-img"></div>
         <div class="search-container">
-            <input type="text" id="strain-search" placeholder="SEARCH STRAINS..." onkeyup="filterStrains()">
+            <input type="text" id="strain-search" placeholder="SEARCH INVENTORY..." onkeyup="filterStrains()">
         </div>
-
         <div id="menu-list"></div>
         <div class="footer">
             <button class="order-btn" onclick="sendEmail()">SEND REQUEST <span id="count-badge"></span></button>
@@ -75,18 +65,10 @@
     </div>
 
     <script>
-        function logError(msg) {
-            const errBox = document.getElementById('error-log');
-            errBox.style.display = 'block';
-            errBox.innerText += "ERROR: " + msg + "\n";
-        }
-
         function filterStrains() {
             let input = document.getElementById('strain-search').value.toLowerCase();
-            let rows = document.querySelectorAll('.item-row');
-            rows.forEach(row => {
-                let txt = row.innerText.toLowerCase();
-                row.style.display = txt.includes(input) ? "flex" : "none";
+            document.querySelectorAll('.item-row').forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(input) ? "flex" : "none";
             });
         }
 
@@ -104,9 +86,8 @@
 
         async function loadMenu() {
             try {
-                const filename = 'menu.xlsx';
-                const resp = await fetch(filename);
-                if (!resp.ok) throw new Error(`Could not find ${filename}. Check case sensitivity and location.`);
+                const resp = await fetch('menu.xlsx');
+                if (!resp.ok) throw new Error("File not found");
                 
                 const buf = await resp.arrayBuffer();
                 const wb = XLSX.read(new Uint8Array(buf), {type: 'array'});
@@ -116,16 +97,18 @@
                     const rows = XLSX.utils.sheet_to_json(wb.Sheets[name], {header: 1});
                     if (rows.length < 2) return;
 
-                    const btn = document.createElement('div');
-                    btn.className = "category-btn";
-                    btn.innerText = name.toUpperCase();
-                    list.appendChild(btn);
+                    const catTitle = document.createElement('div');
+                    catTitle.className = "category-btn";
+                    catTitle.innerText = name.toUpperCase();
+                    list.appendChild(catTitle);
 
-                    const cont = document.createElement('div');
-                    cont.className = 'category-content';
-                    
-                    const h = rows[0].map(val => String(val).toLowerCase());
-                    const f = (keys) => h.findIndex(col => keys.some(k => col.includes(k.toLowerCase())));
+                    const hRow = rows[0];
+                    // SAFE COLUMN FINDER: Checks if the header exists and is a string before calling .includes()
+                    const f = (keys) => hRow.findIndex(col => {
+                        if (!col) return false;
+                        const sCol = String(col).toLowerCase();
+                        return keys.some(k => sCol.includes(k.toLowerCase()));
+                    });
 
                     const sI = f(['strain']);
                     const tI = f(['thc']);
@@ -142,31 +125,28 @@
                             <input type="checkbox" class="order-check" data-strain="${r[sI]}">
                             <div class="item-info" onclick="showDetail('${r[sI]}','${r[mI]||''}','${r[lI]||''}','${r[hI]||''}','${r[qI]||''}','${r[tI]||''}')">
                                 <div style="font-weight:bold; color:#fff;">${r[sI]}</div>
-                                <div style="font-size:10px; color:var(--summa-gold);">THC: ${r[tI]||'N/A'}% | INFO ></div>
+                                <div style="font-size:10px; color:var(--summa-gold);">THC: ${r[tI]||'N/A'}% | TAP FOR DATA</div>
                             </div>
                         `;
-                        row.querySelector('.order-check').onchange = updateCount;
-                        cont.appendChild(row);
+                        row.querySelector('.order-check').onchange = () => {
+                            const count = document.querySelectorAll('.order-check:checked').length;
+                            document.getElementById('count-badge').innerText = count > 0 ? `(${count})` : "";
+                        };
+                        list.appendChild(row);
                     });
-                    list.appendChild(cont);
                 });
                 document.getElementById('loader').style.display='none'; 
                 document.getElementById('app').style.display='flex';
             } catch (err) { 
-                logError(err.message);
-                document.getElementById('loader').innerText = "LOAD FAILED.";
+                document.getElementById('loader').innerText = "DATA ACCESS ERROR. CHECK FILENAME.";
+                console.error(err);
             }
-        }
-
-        function updateCount() {
-            const count = document.querySelectorAll('.order-check:checked').length;
-            document.getElementById('count-badge').innerText = count > 0 ? `(${count})` : "";
         }
 
         function sendEmail() {
             const checks = document.querySelectorAll('.order-check:checked');
             if (checks.length === 0) return;
-            let body = "Inquiry:%0A%0A";
+            let body = "Summa Wholesale Inquiry:%0A%0A";
             checks.forEach(c => body += `- ${c.dataset.strain}%0A`);
             window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Request&body=${body}`;
         }
