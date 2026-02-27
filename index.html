@@ -19,7 +19,6 @@
             background-size: 40px 40px;
         }
 
-        /* CRT SCANLINE OVERLAY */
         body::after {
             content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
@@ -191,7 +190,7 @@
 
                     const cDiv = document.createElement('div');
                     cDiv.id = cId; cDiv.className = 'cat-box';
-                    cDiv.style.display = 'none'; // START CLOSED
+                    cDiv.style.display = 'none';
 
                     let idx = { s:-1, t:-1, h:-1, q:-1, l:-1, m:-1, p:-1 };
                     data.forEach((row) => {
@@ -214,6 +213,7 @@
                             const d = { s:row[idx.s], m:row[idx.m], l:row[idx.l], h:row[idx.h], q:row[idx.q], t:row[idx.t], p:row[idx.p] };
                             item.innerHTML = `
                                 <input type="checkbox" class="check" onchange="updateCount()"
+                                    data-cat="${sName}"
                                     data-full='{"Strain":"${d.s}","Lot":"${d.l||'NA'}","THC":"${d.t||'NA'}","Weight":"${d.q||'NA'}","Price":"${d.p||'NA'}"}'>
                                 <div class="info" style="flex-grow:1; margin-left:15px; cursor:pointer;" onclick="pop('${d.s.replace(/'/g, "")}','${d.m}','${d.l}','${d.h}','${d.q}','${d.t}','${d.p}')">
                                     <div style="font-weight:bold; color:white; font-size:16px; letter-spacing:1px;">${d.s}</div>
@@ -239,12 +239,29 @@
             const checks = Array.from(document.querySelectorAll('.check:checked'));
             if(checks.length === 0) return;
             playSfx(900, 'sine', 0.2);
-            let body = "--- SUMMA_WHOLESALE_OS_EXPORT ---%0A%0A";
+            
+            // GROUPING LOGIC
+            const groups = {};
             checks.forEach(c => {
-                const data = JSON.parse(c.getAttribute('data-full'));
-                body += `[ITEM]: ${data.Strain.toUpperCase()}%0A[LOT]: ${data.Lot} | [THC]: ${data.THC}%25%0A[QTY]: ${data.Weight} | [PRC]: ${data.Price}%0A-------------------------------%0A`;
+                const cat = c.getAttribute('data-cat');
+                if(!groups[cat]) groups[cat] = [];
+                groups[cat].push(JSON.parse(c.getAttribute('data-full')));
             });
-            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Inquiry - ${checks.length} Items&body=${body}`;
+
+            let body = "--- SUMMA_WHOLESALE_OS_EXPORT ---%0A%0A";
+            for(const [catName, items] of Object.entries(groups)) {
+                body += `>>> ${catName.toUpperCase()}%0A`;
+                body += `===============================%0A`;
+                items.forEach(data => {
+                    body += `[ITEM]: ${data.Strain.toUpperCase()}%0A`;
+                    body += `[LOT]: ${data.Lot} | [THC]: ${data.THC}%25%0A`;
+                    body += `[QTY]: ${data.Weight} | [PRC]: ${data.Price}%0A`;
+                    body += `-------------------------------%0A`;
+                });
+                body += `%0A`;
+            }
+            
+            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Request - ${checks.length} Items&body=${body}`;
         }
 
         window.addEventListener('load', start);
