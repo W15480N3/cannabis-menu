@@ -21,7 +21,6 @@
         .logo-bar { background: #000; padding: 25px 15px; text-align: center; border-bottom: 1px solid var(--gold); }
         .logo-img { max-width: 150px; width: 55%; }
         
-        /* FILTER BOX - STRAIN ONLY */
         .filter-wrap { background: #0a0a0a; padding: 12px; border-bottom: 1px solid #222; }
         .filter-input { width: 100%; background: #000; border: 1px solid #333; color: var(--gold); padding: 12px; font-family: inherit; font-size: 12px; outline: none; text-align: center; letter-spacing: 2px;}
 
@@ -30,8 +29,11 @@
         .sub-title { background: #151515; color: #555; padding: 8px 18px; font-size: 9px; border-bottom: 1px solid #111; letter-spacing: 2px; text-transform: uppercase; }
         .row { display: flex; align-items: center; padding: 16px 15px; border-bottom: 1px solid #111; }
         .row.hidden { display: none; }
-        .check { width: 26px; height: 26px; border: 2px solid #333; appearance: none; cursor: pointer; background: #000; flex-shrink: 0; }
-        .check:checked { background: var(--gold); border-color: var(--gold); }
+        
+        /* QUANTITY INPUT STYLING */
+        .qty-input { width: 55px; height: 35px; background: #000; border: 1px solid #444; color: var(--gold); text-align: center; font-family: inherit; font-weight: bold; font-size: 14px; outline: none; }
+        .qty-input:focus { border-color: var(--gold); background: #111; }
+        .qty-active { border-color: var(--gold); box-shadow: 0 0 10px rgba(238, 180, 59, 0.2); }
 
         #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 11000; justify-content: center; align-items: center; padding: 20px; }
         .modal-box { background: #0a0a0a; border: 1px solid var(--gold); width: 100%; max-width: 350px; padding: 25px; }
@@ -48,7 +50,7 @@
     <div id="loader">
         <svg class="leaf-svg" viewBox="0 0 512 512"><path d="M495.9,235.3c-23.7-29.2-80.5-62.2-121.2-67.9c32.4-38,62.8-86.3,64.2-89c5-9.1,1.7-20.5-7.4-25.5c-9.1-5-20.5-1.7-25.5,7.4 c-0.6,1-27.1,46.1-56.5,82.4c-0.2-31.5,1.2-84.3,1.2-84.3c0.4-10.4-7.7-19-18.1-19.4c-10.4-0.4-19,7.7-19.4,18.1 c-0.1,1.9-0.8,31.7-1.1,70.6c-28-36.9-63.5-73-63.5-73c-7.3-7.5-19.2-7.7-26.6-0.3c-7.5,7.3-7.7,19.2-0.3,26.6 c0.3,0.3,31,31.6,56.6,62.4c-41.2,2.3-95.2,16.5-131.7,39.9c-8.9,5.7-11.5,17.5-5.8,26.4c5.7,8.9,17.5,11.5,26.4,5.8 c30.6-19.6,77.5-31.8,113.3-33.8c-23.6,33.1-47.5,84.4-48.5,87.6c-3.1,10,2.6,20.6,12.6,23.7s20.6-2.6,23.7-12.6 c0.4-1.2,19.7-47.3,39.3-81.6c17.5,23.1,38.9,64.5,38.9,64.5c4.7,9.3,16.1,13.1,25.4,8.3s13.1-16.1,8.3-25.4 c-0.4-0.8-17.2-31.7-32-55.6c43.4,8.9,89.5,41.9,112.9,69.5c6.5,7.7,18.1,8.6,25.7,2.1C500.5,260.6,501.4,249,494.9,241.4 C495.2,241.1,495.6,238.2,495.9,235.3z M167.3,367.6l-37.1-71.1l-71.1-37.1l71.1-37.1l37.1-71.1l37.1,71.1l71.1,37.1l-71.1,37.1 L167.3,367.6z"/></svg>
         <div class="loading-bar-container"><div class="loading-bar-fill"></div></div>
-        <div style="font-size:9px; color:var(--gold); margin-top:10px; letter-spacing:2px;">INIT_SUMMA_VAULT_v7</div>
+        <div style="font-size:9px; color:var(--gold); margin-top:10px; letter-spacing:2px;">SUMMA_OS_RECON_v8</div>
     </div>
 
     <div id="modal" onclick="this.style.display='none'">
@@ -58,7 +60,7 @@
                 <div style="grid-column: span 2;"><div class="label">HARVEST_DATE</div><div id="m-harvest" class="val" style="color:var(--gold)">--</div></div>
                 <div><div class="label">METRC_ID</div><div id="m-metrc" class="val">--</div></div>
                 <div><div class="label">LOT_NUM</div><div id="m-lot" class="val">--</div></div>
-                <div><div class="label">WEIGHT</div><div id="m-qty" class="val">--</div></div>
+                <div><div class="label">INV_AVAIL</div><div id="m-qty" class="val">--</div></div>
                 <div><div class="label">THC%</div><div id="m-thc" class="val" style="color:#0f0;">--</div></div>
             </div>
             <button onclick="document.getElementById('modal').style.display='none'" style="width:100%; margin-top:20px; padding:12px; background:#111; color:#fff; border:1px solid #333; cursor:pointer;">EXIT_NODE</button>
@@ -90,7 +92,6 @@
 
         let inventory = {};
 
-        // Converts Excel Serial Date to MM/DD/YYYY
         function formatExcelDate(serial) {
             if(!serial || isNaN(serial)) return serial || 'N/A';
             const date = new Date(Math.round((serial - 25569) * 86400 * 1000));
@@ -124,6 +125,26 @@
             document.getElementById('m-qty').innerText = d.qty || 'N/A';
             document.getElementById('m-thc').innerText = d.rawThc + '%';
             document.getElementById('modal').style.display = 'flex';
+        }
+
+        function updateQuantity(key, val) {
+            inventory[key].requestQty = val;
+            const input = document.querySelector(`input[data-key="${key}"]`);
+            if(val > 0) {
+                input.classList.add('qty-active');
+                playSfx(600, 'sine', 0.05);
+            } else {
+                input.classList.remove('qty-active');
+            }
+            updateCount();
+        }
+
+        function updateCount() {
+            let total = 0;
+            Object.values(inventory).forEach(item => {
+                if(item.requestQty > 0) total += 1;
+            });
+            document.getElementById('count').innerText = total > 0 ? `(${total})` : "";
         }
 
         async function start() {
@@ -174,11 +195,11 @@
                                 thc: thcNum,
                                 rawThc: row[cols.t],
                                 qty: row[cols.q],
-                                prc: row[cols.p],
                                 metrc: row[cols.m],
                                 harvest: row[cols.h],
                                 cat: sName,
-                                sub: curSub
+                                sub: curSub,
+                                requestQty: 0
                             });
                         }
                     });
@@ -188,8 +209,6 @@
                         const st = document.createElement('div');
                         st.className = 'sub-title'; st.innerText = section.title;
                         cBox.appendChild(st);
-                        
-                        // SORTING: DESCENDING THC
                         section.items.sort((a, b) => b.thc - a.thc);
 
                         section.items.forEach(item => {
@@ -198,7 +217,7 @@
                             itemRow.className = 'row';
                             itemRow.dataset.key = item.key;
                             itemRow.innerHTML = `
-                                <input type="checkbox" class="check" onchange="playSfx(600,'sine',0.05);updateCount();" value="${item.key}">
+                                <input type="number" class="qty-input" data-key="${item.key}" placeholder="0" min="0" oninput="updateQuantity('${item.key}', this.value)">
                                 <div style="flex-grow:1; margin-left:15px; cursor:pointer;" onclick="showDetails('${item.key}')">
                                     <div style="font-weight:bold; color:#fff;">${item.strain}</div>
                                     <div style="font-size:10px; color:var(--gold); margin-top:4px;">THC: ${item.rawThc}% | Lot: ${item.lot}</div>
@@ -222,44 +241,42 @@
             } catch(e) { console.error(e); }
         }
 
-        function updateCount() {
-            const n = document.querySelectorAll('.check:checked').length;
-            document.getElementById('count').innerText = n > 0 ? `(${n})` : "";
-        }
-
         function clearCart() {
             playSfx(100, 'sawtooth', 0.2);
-            document.querySelectorAll('.check').forEach(c => c.checked = false);
+            document.querySelectorAll('.qty-input').forEach(input => {
+                input.value = "";
+                input.classList.remove('qty-active');
+            });
+            Object.keys(inventory).forEach(k => inventory[k].requestQty = 0);
             updateCount();
         }
 
         function send() {
-            const selected = Array.from(document.querySelectorAll('.check:checked'));
-            if(selected.length === 0) return;
+            const itemsToOrder = Object.values(inventory).filter(i => i.requestQty > 0);
+            if(itemsToOrder.length === 0) return;
             playSfx(800, 'sine', 0.2);
 
             let order = {};
-            selected.forEach(chk => {
-                const d = inventory[chk.value];
+            itemsToOrder.forEach(d => {
                 if(!order[d.cat]) order[d.cat] = {};
                 if(!order[d.cat][d.sub]) order[d.cat][d.sub] = [];
                 order[d.cat][d.sub].push(d);
             });
 
-            let body = "SUMMA WHOLESALE REQUEST%0A%0A";
+            let body = "SUMMA WHOLESALE ORDER REQUEST%0A%0A";
             for (const [cat, subs] of Object.entries(order)) {
                 body += `[ CATEGORY: ${cat.toUpperCase()} ]%0A`;
                 for (const [subName, items] of Object.entries(subs)) {
                     body += `%0ATYPE: ${subName}%0A----------------------%0A`;
                     items.forEach(i => {
                         body += `• ${i.strain.toUpperCase()}%0A`;
+                        body += `  ORDER QTY: ${i.requestQty}%0A`;
                         body += `  LOT: ${i.lot} | THC: ${i.rawThc}%25%0A`;
-                        body += `  HARVEST: ${formatExcelDate(i.harvest)}%0A`;
-                        body += `  WEIGHT: ${i.qty}%0A%0A`;
+                        body += `  HARVEST: ${formatExcelDate(i.harvest)}%0A%0A`;
                     });
                 }
             }
-            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Order&body=${body}`;
+            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Order Request&body=${body}`;
         }
 
         window.onload = start;
