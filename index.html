@@ -10,49 +10,50 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: #d1d1d1; font-family: 'Courier New', monospace; margin: 0; padding: 0; height: 100dvh; overflow: hidden; }
         
-        #loader { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--bg); z-index: 10000; color: var(--gold); text-align: center; padding: 20px; }
-        .spinner { width: 40px; height: 40px; border: 3px solid #333; border-top: 3px solid var(--gold); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        #loader { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--bg); z-index: 10000; color: var(--gold); text-align: center; }
+        .spinner { width: 50px; height: 50px; border: 4px solid #222; border-top: 4px solid var(--gold); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         #app { display: none; width: 100%; height: 100dvh; max-width: 450px; margin: 0 auto; background: var(--card); flex-direction: column; }
-        .logo-bar { background: var(--bg); padding: 20px; text-align: center; border-bottom: 1px solid var(--gold); flex-shrink: 0; }
-        .logo-img { max-width: 180px; width: 60%; }
+        .logo-bar { background: var(--bg); padding: 25px 15px; text-align: center; border-bottom: 1px solid var(--gold); flex-shrink: 0; }
+        .logo-img { max-width: 200px; width: 65%; }
         
         #menu-list { background: #000; flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         
-        .cat-header { background: #1a1a1a; color: var(--gold); padding: 20px; font-weight: 900; border-bottom: 1px solid #333; cursor: pointer; display: flex; justify-content: space-between; }
-        .cat-box { display: none; background: #000; }
+        .cat-header { background: #111; color: var(--gold); padding: 22px; font-weight: 900; border-bottom: 1px solid #222; cursor: pointer; display: flex; justify-content: space-between; font-size: 15px; }
+        .cat-box { display: none; background: #050505; }
 
-        .row { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #111; }
+        .row { display: flex; align-items: center; padding: 18px 15px; border-bottom: 1px solid #111; width: 100%; }
         .info { flex-grow: 1; margin-left: 15px; cursor: pointer; }
-        .check { width: 28px; height: 28px; border: 2px solid var(--gold); appearance: none; cursor: pointer; flex-shrink: 0; }
+        .check { width: 30px; height: 30px; border: 2px solid var(--gold); appearance: none; cursor: pointer; flex-shrink: 0; }
         .check:checked { background: var(--gold); }
 
-        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 11000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-box { background: #1a1a1a; border: 1px solid var(--gold); width: 100%; max-width: 340px; padding: 20px; }
-        .label { color: var(--gold); font-size: 10px; margin-top: 10px; font-weight: bold; }
-        .val { color: #fff; font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 4px; margin-bottom: 4px; }
+        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 11000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-box { background: #1a1a1a; border: 1px solid var(--gold); width: 100%; max-width: 350px; padding: 25px; border-radius: 4px; }
+        .label { color: var(--gold); font-size: 9px; margin-top: 14px; font-weight: bold; text-transform: uppercase; }
+        .val { color: #fff; font-size: 15px; border-bottom: 1px solid #333; padding-bottom: 4px; margin-bottom: 2px; }
 
-        .footer { padding: 15px; background: var(--bg); border-top: 1px solid var(--gold); }
-        .btn { width: 100%; padding: 18px; background: var(--gold); color: #000; border: none; font-weight: 900; font-family: inherit; cursor: pointer; }
+        .footer { padding: 18px; background: var(--bg); border-top: 1px solid var(--gold); }
+        .btn { width: 100%; padding: 20px; background: var(--gold); color: #000; border: none; font-weight: 900; font-family: inherit; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="loader">
         <div class="spinner"></div>
-        <div id="status">CONNECTING...</div>
+        <div id="status">SYNCING TERMINAL...</div>
     </div>
 
     <div id="modal" onclick="this.style.display='none'">
         <div class="modal-box" onclick="event.stopPropagation()">
-            <div id="m-strain" style="color:var(--gold); font-weight:bold; font-size:20px; border-bottom: 1px solid var(--gold); padding-bottom:10px; margin-bottom:10px;">--</div>
-            <div class="label">METRC ID</div><div id="m-metrc" class="val">--</div>
+            <div id="m-strain" style="color:var(--gold); font-weight:bold; font-size:22px; border-bottom: 2px solid var(--gold); padding-bottom:10px; margin-bottom:15px;">--</div>
+            <div class="label">METRC ID #</div><div id="m-metrc" class="val">--</div>
             <div class="label">LOT NUMBER</div><div id="m-lot" class="val">--</div>
             <div class="label">HARVEST DATE</div><div id="m-harvest" class="val">--</div>
-            <div class="label">STOCK QUANTITY</div><div id="m-qty" class="val">--</div>
-            <div class="label">THC %</div><div id="m-thc" class="val">--</div>
-            <button onclick="document.getElementById('modal').style.display='none'" style="width:100%; margin-top:20px; padding:10px; background:#333; color:#fff; border:none; font-family:inherit;">BACK</button>
+            <div class="label">FULL WEIGHT / QTY</div><div id="m-qty" class="val">--</div>
+            <div class="label">POTENCY (THC%)</div><div id="m-thc" class="val">--</div>
+            <div class="label">UNIT PRICE</div><div id="m-price" class="val">--</div>
+            <button onclick="document.getElementById('modal').style.display='none'" style="width:100%; margin-top:25px; padding:12px; background:#333; color:white; border:none; font-family:inherit;">CLOSE</button>
         </div>
     </div>
 
@@ -60,7 +61,7 @@
         <div class="logo-bar"><img src="summa.webp" alt="SUMMA" class="logo-img"></div>
         <div id="menu-list"></div>
         <div class="footer">
-            <button class="btn" onclick="send()">REQUEST SELECTED <span id="count"></span></button>
+            <button class="btn" onclick="send()">REQUEST QUOTE <span id="count"></span></button>
         </div>
     </div>
 
@@ -68,56 +69,58 @@
         function toggle(id) {
             const el = document.getElementById(id);
             if (!el) return;
-            const open = el.style.display === 'block';
+            const isOpen = el.style.display === 'block';
             document.querySelectorAll('.cat-box').forEach(c => c.style.display = 'none');
-            el.style.display = open ? 'none' : 'block';
+            el.style.display = isOpen ? 'none' : 'block';
         }
 
-        function pop(s, m, l, h, q, t) {
+        function pop(s, m, l, h, q, t, p) {
             document.getElementById('m-strain').innerText = s || 'N/A';
             document.getElementById('m-metrc').innerText = m || 'N/A';
             document.getElementById('m-lot').innerText = l || 'N/A';
             document.getElementById('m-harvest').innerText = h || 'N/A';
             document.getElementById('m-qty').innerText = q || 'N/A';
             document.getElementById('m-thc').innerText = t || 'N/A';
+            document.getElementById('m-price').innerText = p || 'N/A';
             document.getElementById('modal').style.display = 'flex';
         }
 
         async function start() {
             try {
-                const response = await fetch('menu.xlsx');
-                if(!response.ok) throw "FILE NOT FOUND (404)";
-                
+                const response = await fetch('menu.xlsx?v=' + Date.now());
                 const arrayBuffer = await response.arrayBuffer();
                 const workbook = XLSX.read(new Uint8Array(arrayBuffer), {type:'array'});
                 const list = document.getElementById('menu-list');
 
-                if (!workbook.SheetNames.length) throw "EXCEL FILE IS EMPTY";
-
                 workbook.SheetNames.forEach((sName, i) => {
                     const data = XLSX.utils.sheet_to_json(workbook.Sheets[sName], {header:1});
-                    if (!data || data.length < 1) return;
+                    if (!data || data.length < 2) return;
 
-                    // DEFENSIVE HEADER MAPPING
-                    const headerRow = data[0] || [];
-                    const headers = headerRow.map(h => {
-                        if (h === undefined || h === null) return "";
-                        return String(h).toLowerCase().replace(/[#*_\s]/g, '');
-                    });
+                    // SMART ROW DETECTION: Finds which row actually contains "Strain"
+                    let headerIndex = 0;
+                    for(let r=0; r < data.length; r++) {
+                        if(data[r].some(cell => String(cell).toLowerCase().includes('strain'))) {
+                            headerIndex = r;
+                            break;
+                        }
+                    }
 
-                    const getCol = (keys) => headers.findIndex(h => {
-                        if (!h) return false;
-                        return keys.some(k => h.includes(k));
-                    });
+                    const rawHeaders = data[headerIndex] || [];
+                    const headers = rawHeaders.map(h => String(h || "").toLowerCase().replace(/[#*_\s%]/g, ''));
+                    
+                    const getCol = (keys) => headers.findIndex(h => keys.some(k => h.includes(k)));
 
                     const idx = {
                         s: getCol(['strain']),
                         t: getCol(['thc']),
                         h: getCol(['harvest']),
-                        q: getCol(['quant', 'qty']),
+                        q: getCol(['weight', 'fullweight']),
                         l: getCol(['lot']),
-                        m: getCol(['metrc'])
+                        m: getCol(['metrc']),
+                        p: getCol(['price'])
                     };
+
+                    if (idx.s === -1) return;
 
                     const cId = 'cat-' + i;
                     const hDiv = document.createElement('div');
@@ -130,19 +133,19 @@
                     cDiv.id = cId;
                     cDiv.className = 'cat-box';
 
-                    data.slice(1).forEach(row => {
-                        if(!row || idx.s === -1 || !row[idx.s]) return;
+                    data.slice(headerIndex + 1).forEach(row => {
+                        if(!row || !row[idx.s] || String(row[idx.s]).trim() === "") return;
                         
                         const item = document.createElement('div');
                         item.className = 'row';
                         item.innerHTML = `
                             <input type="checkbox" class="check" data-name="${row[idx.s]}">
                             <div class="info">
-                                <div style="font-weight:bold; color:white;">${row[idx.s]}</div>
-                                <div style="font-size:11px; color:var(--gold);">THC: ${row[idx.t]||'--'}% | DETAILS ></div>
+                                <div style="font-weight:bold; color:white; font-size:16px;">${row[idx.s]}</div>
+                                <div style="font-size:11px; color:var(--gold); margin-top:4px;">THC: ${row[idx.t]||'--'}% | ${row[idx.p]||''}</div>
                             </div>
                         `;
-                        item.querySelector('.info').onclick = () => pop(row[idx.s], row[idx.m], row[idx.l], row[idx.h], row[idx.q], row[idx.t]);
+                        item.querySelector('.info').onclick = () => pop(row[idx.s], row[idx.m], row[idx.l], row[idx.h], row[idx.q], row[idx.t], row[idx.p]);
                         item.querySelector('.check').onchange = () => {
                             const n = document.querySelectorAll('.check:checked').length;
                             document.getElementById('count').innerText = n > 0 ? `(${n})` : "";
@@ -156,15 +159,14 @@
                 document.getElementById('app').style.display = 'flex';
 
             } catch(e) {
-                document.getElementById('status').innerHTML = `<span style="color:#ff4444">CRITICAL ERROR:</span><br>${e}`;
-                console.error("System Crash:", e);
+                document.getElementById('status').innerText = "LOAD ERROR. REFRESH PAGE.";
             }
         }
 
         function send() {
             const sel = Array.from(document.querySelectorAll('.check:checked')).map(c => c.dataset.name);
             if(sel.length === 0) return;
-            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Request&body=Requesting Information For:%0A%0A- ${sel.join('%0A- ')}`;
+            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Request&body=Inquiry for:%0A%0A- ${sel.join('%0A- ')}`;
         }
 
         window.addEventListener('load', start);
