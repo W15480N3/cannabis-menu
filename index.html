@@ -108,7 +108,7 @@
 
     <div id="loader">
         <div class="alien-circle"></div>
-        <div style="margin-top:20px; letter-spacing: 5px; color: #0f0;">LOADING SUMMA INVENTORY...</div>
+        <div style="margin-top:20px; letter-spacing: 5px; color: #0f0;">RANKING BY PURITY...</div>
     </div>
 
     <div id="app">
@@ -173,6 +173,7 @@
 
                 wb.SheetNames.forEach((name, idx) => {
                     const rows = XLSX.utils.sheet_to_json(wb.Sheets[name], {header: 1});
+                    
                     const b = document.createElement('button');
                     b.className = "category-btn";
                     b.innerHTML = `<span>📂 ${name.toUpperCase()}</span> <span>◈</span>`;
@@ -184,6 +185,39 @@
                     cont.className = "category-content";
 
                     let sCol = -1, tCol = -1, pCol = -1;
+                    let currentSectionItems = [];
+                    let currentSectionTitle = "General";
+
+                    const flushSection = (title) => {
+                        if (currentSectionItems.length > 0) {
+                            const h = document.createElement('div');
+                            h.className = "section-header";
+                            h.innerText = "CATEGORY: " + title;
+                            cont.appendChild(h);
+
+                            // THE SORTING LOGIC: 
+                            // Convert THC to number, handle strings like "24.5%", sort high to low
+                            currentSectionItems.sort((a, b) => {
+                                let valA = parseFloat(a.thc.toString().replace(/[^0-9.]/g, '')) || 0;
+                                let valB = parseFloat(b.thc.toString().replace(/[^0-9.]/g, '')) || 0;
+                                return valB - valA;
+                            });
+
+                            currentSectionItems.forEach(item => {
+                                const rowDiv = document.createElement('div');
+                                rowDiv.className = 'item-row';
+                                rowDiv.innerHTML = `
+                                    <input type="checkbox" class="order-check" value="${item.name} (${name})">
+                                    <div>
+                                        <div style="font-weight:bold; color:#fff; font-size:15px;">${item.name}</div>
+                                        <div style="color:#0f0; font-size:11px;">THC: ${item.thc}% | Wholesale: $${item.price}</div>
+                                    </div>
+                                `;
+                                cont.appendChild(rowDiv);
+                            });
+                            currentSectionItems = [];
+                        }
+                    };
 
                     rows.forEach((r) => {
                         if (r.includes("Strain")) {
@@ -193,26 +227,24 @@
                             return;
                         }
 
+                        // If it's a Section Title Row
                         if (r[0] && !r[tCol] && !r[pCol] && r[0] !== "Strain") {
-                            const h = document.createElement('div');
-                            h.className = "section-header";
-                            h.innerText = "CATEGORY: " + r[0];
-                            cont.appendChild(h);
+                            flushSection(currentSectionTitle);
+                            currentSectionTitle = r[0];
+                            return;
                         }
 
+                        // If it's a Product Row
                         if (sCol > -1 && r[sCol] && r[sCol] !== "Strain") {
-                            const rowDiv = document.createElement('div');
-                            rowDiv.className = 'item-row';
-                            rowDiv.innerHTML = `
-                                <input type="checkbox" class="order-check" value="${r[sCol]} (${name})">
-                                <div>
-                                    <div style="font-weight:bold; color:#fff; font-size:15px;">${r[sCol]}</div>
-                                    <div style="color:#0f0; font-size:11px;">THC: ${r[tCol] || '?'}% | Wholesale: $${r[pCol] || 'TBD'}</div>
-                                </div>
-                            `;
-                            cont.appendChild(rowDiv);
+                            currentSectionItems.push({
+                                name: r[sCol],
+                                thc: r[tCol] || '?',
+                                price: r[pCol] || 'TBD'
+                            });
                         }
                     });
+                    
+                    flushSection(currentSectionTitle); // Final flush for the last section
                     list.appendChild(cont);
                 });
             } catch (err) { console.error(err); }
