@@ -1,0 +1,12 @@
+body { background: #000; color: #0f0; font-family: monospace; overflow-x: hidden; }
+#loader { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+.bar { width: 200px; height: 10px; border: 1px solid #0f0; margin-top: 10px; }
+#fill { height: 100%; background: #0f0; width: 0%; animation: load 3s forwards; }
+@keyframes load { to { width: 100%; } }
+
+.winamp-window { 
+    width: 90%; max-width: 400px; margin: 20px auto; 
+    border: 3px solid #777; background: #c0c0c0; color: #000; 
+}
+.title-bar { background: darkblue; color: white; padding: 5px; font-weight: bold; }
+button { width: 100%; padding: 15px; background: #0f0; border: 2px solid #000; font-weight: bold; }
