@@ -8,7 +8,7 @@
     <style>
         :root {
             --summa-gold: #eeb43b; 
-            --summa-gold-glow: rgba(238, 180, 59, 0.15);
+            --summa-gold-glow: rgba(238, 180, 59, 0.2);
             --summa-black: #050505;
             --summa-grey: #1a1a1a;
         }
@@ -17,21 +17,24 @@
             background: var(--summa-black); 
             color: #d1d1d1; 
             font-family: 'Courier New', monospace; 
-            margin: 0; padding: 0; overflow: hidden;
+            margin: 0; padding: 0; overflow-x: hidden;
         }
 
-        /* GOLD SCANLINES */
+        /* GOLD SCANLINES WITH FLICKER */
         body::after {
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(238, 180, 59, 0.03) 2px);
             pointer-events: none; z-index: 10001;
+            animation: flicker 0.15s infinite;
         }
+        @keyframes flicker { 0% { opacity: 0.9; } 50% { opacity: 1; } 100% { opacity: 0.95; } }
 
         /* LOADING SCREEN */
         #loader { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             display: flex; flex-direction: column; justify-content: center; 
             align-items: center; background: var(--summa-black); z-index: 10000; 
+            transition: opacity 0.8s ease;
         }
 
         .loader-container { position: relative; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; }
@@ -67,8 +70,7 @@
             background: #000; margin: 10px; 
             border: 1px solid #222; border-radius: 8px;
             overflow-y: auto; height: 60vh;
-            /* GOLD INNER GLOW */
-            box-shadow: inset 0 0 20px var(--summa-gold-glow);
+            box-shadow: inset 0 0 25px var(--summa-gold-glow);
         }
         
         .category-btn { 
@@ -77,23 +79,22 @@
             color: var(--summa-gold); text-align: left; border: none;
             border-bottom: 1px solid #222; font-weight: bold; 
             cursor: pointer; display: flex; justify-content: space-between;
-            transition: background 0.2s;
         }
-        .category-btn:active { background: #222; }
 
         .category-content { display: none; background: rgba(238, 180, 59, 0.05); }
         
         .section-header { 
             background: #111; color: var(--summa-gold); 
             padding: 10px 15px; font-size: 11px; border-bottom: 1px solid #222;
-            text-transform: uppercase;
+            text-transform: uppercase; letter-spacing: 1px;
         }
 
-        .item-row { display: flex; align-items: center; padding: 14px; border-bottom: 1px solid #111; }
+        .item-row { display: flex; align-items: center; padding: 14px; border-bottom: 1px solid #111; cursor: pointer; }
         
         .item-row input[type="checkbox"] { 
             appearance: none; width: 22px; height: 22px; 
             border: 1px solid var(--summa-gold); border-radius: 4px; margin-right: 15px; 
+            cursor: pointer;
         }
         .item-row input:checked { background: var(--summa-gold); }
 
@@ -104,6 +105,7 @@
             border: none; border-radius: 4px; 
             font-weight: 800; cursor: pointer;
             box-shadow: 0 0 15px var(--summa-gold-glow);
+            text-transform: uppercase;
         }
     </style>
 </head>
@@ -128,13 +130,12 @@
     </div>
 
     <script>
-        // --- AUDIO ENGINE ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playBeep(freq, duration) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            osc.type = 'sine'; // High-end tech sound
+            osc.type = 'sine';
             osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
             gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
@@ -154,14 +155,14 @@
 
         window.onload = () => {
             loadMenu();
-            // FORCED DELAY (2.5 Seconds) to appreciate the loading screen
             setTimeout(() => {
-                document.getElementById('loader').style.opacity = '0';
+                const loader = document.getElementById('loader');
+                loader.style.opacity = '0';
                 setTimeout(() => {
-                    document.getElementById('loader').style.display = 'none';
+                    loader.style.display = 'none';
                     document.getElementById('app').style.display = 'block';
-                    playBeep(880, 0.05); // "System Ready" chirp
-                }, 500);
+                    playBeep(880, 0.05);
+                }, 800);
             }, 2500);
         };
 
@@ -195,7 +196,6 @@
                             h.innerText = title;
                             cont.appendChild(h);
 
-                            // Highest THC Sorting
                             currentItems.sort((a, b) => {
                                 let vA = parseFloat(a.thc.toString().replace(/[^0-9.]/g, '')) || 0;
                                 let vB = parseFloat(b.thc.toString().replace(/[^0-9.]/g, '')) || 0;
@@ -213,7 +213,11 @@
                                     playBeep(600, 0.05);
                                 };
                                 r.innerHTML = `
-                                    <input type="checkbox" class="order-check" value="${item.name}">
+                                    <input type="checkbox" class="order-check" 
+                                           data-category="${name}" 
+                                           data-strain="${item.name}" 
+                                           data-thc="${item.thc}" 
+                                           data-price="${item.price}">
                                     <div>
                                         <div style="font-weight:bold; color:#fff;">${item.name}</div>
                                         <div style="color:var(--summa-gold); font-size:11px; margin-top:4px;">THC: ${item.thc}% | $${item.price}</div>
@@ -248,9 +252,30 @@
         function sendEmail() {
             const checks = document.querySelectorAll('.order-check:checked');
             if (checks.length === 0) return;
-            let items = "Inquiry for:%0A";
-            checks.forEach(c => items += "- " + c.value + "%0A");
-            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Request&body=${items}`;
+
+            let emailBody = "I am interested in the following wholesale items:%0A%0A";
+            
+            // Group selections by category for the email
+            const categories = {};
+            checks.forEach(c => {
+                const cat = c.getAttribute('data-category');
+                if (!categories[cat]) categories[cat] = [];
+                categories[cat].push({
+                    name: c.getAttribute('data-strain'),
+                    thc: c.getAttribute('data-thc'),
+                    price: c.getAttribute('data-price')
+                });
+            });
+
+            for (const cat in categories) {
+                emailBody += `[ ${cat.toUpperCase()} ]%0A`;
+                categories[cat].forEach(item => {
+                    emailBody += ` - ${item.name} (THC: ${item.thc}% | $${item.price})%0A`;
+                });
+                emailBody += `%0A`;
+            }
+
+            window.location.href = `mailto:tiea@euphoriawellnessnv.com?subject=Wholesale Quote Request&body=${emailBody}`;
         }
     </script>
 </body>
